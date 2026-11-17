@@ -9,39 +9,76 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
-<link rel="stylesheet" href="/css/app.css">
+<link rel="stylesheet" href="/css/app.css?v=3">
+<link rel="stylesheet" href="/css/auth.css?v=2">
 </head>
-<body>
-<header id="siteHeader"></header>
+<body class="auth-body">
 
-<main class="wrap" style="padding:56px 0 90px">
-  <div class="auth">
-    <p class="eyebrow">Akun usaha</p>
-    <h1 class="h2" style="font-size:34px">Masuk untuk kelola pembayaran.</h1>
-    <p class="muted" style="font-size:14px;margin-top:10px">Semua tagihan yang kamu buat akan tercatat di akun ini.</p>
+<div class="auth2">
+  <aside class="auth2__art">
+    <a class="auth2__brand" href="/"><img src="/assets/brand/icon-48.png" alt=""> <span>Clinqoo</span></a>
 
-    <div class="panel" style="margin-top:22px">
-      <div class="auth__switch">
-        <button type="button" id="tabLogin" class="is-on">Masuk</button>
-        <button type="button" id="tabRegister">Daftar</button>
+    <div class="auth2__claim">
+      <p class="auth2__eyebrow">Payment gateway QRIS</p>
+      <h2>Satu akun untuk<br>semua tagihan.</h2>
+      <p>Tagihan dibuat dalam hitungan detik, biaya terlihat di depan, dan dana bisa diajukan cair kapan saja.</p>
+    </div>
+
+    <ul class="auth2__list">
+      <li><b>0,7%</b><span>Per transaksi, tanpa biaya bulanan</span></li>
+      <li><b>1 QRIS</b><span>Semua e-wallet dan mobile banking</span></li>
+      <li><b>Hari ini</b><span>Pencairan setelah pengajuan</span></li>
+    </ul>
+  </aside>
+
+  <section class="auth2__side">
+    <div class="auth2__form">
+      <div class="auth2__head">
+        <p class="eyebrow">Akun usaha</p>
+        <h1 id="authHeadline">Masuk ke akunmu.</h1>
+        <p id="authSub">Kelola tagihan, transaksi, dan pencairan di satu tempat.</p>
       </div>
+
+      <div class="auth2__tabs" role="tablist">
+        <button type="button" id="tabLogin" class="is-on" role="tab">Masuk</button>
+        <button type="button" id="tabRegister" role="tab">Buat akun</button>
+      </div>
+
       <form id="authForm">
-        <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="kamu@usaha.id" required></div>
-        <div class="field" id="bizField" hidden><label for="business">Nama usaha</label><input id="business" type="text" maxlength="80" placeholder="Kedai Kopi Senja"></div>
-        <div class="field"><label for="password">Password</label><input id="password" type="password" minlength="8" autocomplete="current-password" placeholder="Minimal 8 karakter" required></div>
+        <div class="field" id="bizField" hidden>
+          <label for="business">Nama usaha</label>
+          <input id="business" type="text" maxlength="80" placeholder="Kedai Kopi Senja" autocomplete="organization">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="kamu@usaha.id" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="pwfield">
+            <input id="password" type="password" minlength="8" autocomplete="current-password" placeholder="Minimal 8 karakter" required>
+            <button class="pwfield__eye" id="togglePw" type="button" aria-label="Tampilkan password">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.8 12S5.4 5.4 12 5.4 22.2 12 22.2 12 18.6 18.6 12 18.6 1.8 12 1.8 12Z"/><circle cx="12" cy="12" r="3.1"/></svg>
+            </button>
+          </div>
+        </div>
+        <p class="auth2__hint" id="pwHint" hidden>Minimal 8 karakter, tanpa syarat rumit.</p>
+
         <div id="authMsg" class="banner banner--err" hidden></div>
         <button class="btn btn--block" type="submit" id="authBtn">Masuk</button>
       </form>
-    </div>
-    <p class="muted" style="font-size:12px;margin-top:14px">Dengan masuk, kamu setuju pada <a class="link-u" href="/legal/" style="font-size:12px">syarat layanan</a>.</p>
-  </div>
-</main>
 
-<footer id="siteFooter"></footer>
+      <p class="auth2__legal">Dengan melanjutkan, kamu setuju pada <a class="link-u" href="/legal/" style="font-size:11.5px">syarat layanan</a> dan kebijakan privasi.</p>
+      <p class="auth2__back"><a href="/">Kembali ke halaman utama</a></p>
+    </div>
+  </section>
+</div>
+
 <div class="toast" id="toast"></div>
-<script src="/js/site.js"></script>
-<script src="/js/page-masuk.js"></script>
+<script src="/js/page-masuk.js?v=2"></script>
 </body>
 </html>

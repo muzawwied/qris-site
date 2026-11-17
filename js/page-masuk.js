@@ -14,8 +14,25 @@
     $('#tabLogin').classList.toggle('is-on', t === 'login');
     $('#tabRegister').classList.toggle('is-on', t === 'register');
     $('#bizField').hidden = t !== 'register';
-    $('#authBtn').textContent = t === 'register' ? 'Daftar' : 'Masuk';
+    $('#pwHint').hidden = t !== 'register';
+    $('#authBtn').textContent = t === 'register' ? 'Buat akun' : 'Masuk';
+    $('#authHeadline').textContent = t === 'register' ? 'Buat akun usahamu.' : 'Masuk ke akunmu.';
+    $('#authSub').textContent = t === 'register'
+      ? 'Cukup nama usaha, email, dan password. Tanpa unggah dokumen.'
+      : 'Kelola tagihan, transaksi, dan pencairan di satu tempat.';
+    $('#password').setAttribute('autocomplete', t === 'register' ? 'new-password' : 'current-password');
     $('#authMsg').hidden = true;
+  }
+
+  var eye = $('#togglePw');
+  if (eye) {
+    eye.addEventListener('click', function () {
+      var input = $('#password');
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      eye.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+      eye.style.color = show ? 'var(--ink)' : '';
+    });
   }
 
   $('#tabLogin').addEventListener('click', function () { setTab('login'); });
@@ -47,7 +64,7 @@
         m.hidden = false;
         m.textContent = err.message;
         btn.disabled = false;
-        btn.textContent = tab === 'register' ? 'Daftar' : 'Masuk';
+        btn.textContent = tab === 'register' ? 'Buat akun' : 'Masuk';
       });
   });
 })();
