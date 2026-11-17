@@ -137,5 +137,7 @@
 .cred__label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 .cred__row { display: flex; align-items: center; gap: 8px; }
 .cred__row .keybox { flex: 1; min-width: 0; }
-.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex: 0 0 auto; border: 1px solid var(--line-strong); background: var(--paper); border-radius: var(--r-sm); color: var(--ink); cursor: pointer; }
-.icon-btn:hover { background: rgba(23,22,15,.05); }
+.keybox--withicon { position: relative; padding-right: 44px; }
+.keybox__eye { position: absolute; right: 6px; top: 50.keybox--withicon { position: relative; padding-right: 44px; }
+.keybox__eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; border-radius: 4px; }
+.keybox__eye:hover { color: var(--ink); background: transparent; }
