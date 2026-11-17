@@ -59,4 +59,7 @@
   $('#nextBtn').addEventListener('click', function () { state.offset += state.limit; load(); });
 
   document.addEventListener('session', function (ev) { if (ev.detail.user) load(); else location.href = '/app/'; });
+
+  /* muat langsung tanpa menunggu event sesi */
+  load();
 })();

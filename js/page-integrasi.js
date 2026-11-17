@@ -32,4 +32,7 @@
   }).catch(function () { $('#hApi').textContent = 'Tidak terjangkau'; });
 
   document.addEventListener('session', function (ev) { if (ev.detail.user) loadKey(); else location.href = '/app/'; });
+
+  /* muat langsung tanpa menunggu event sesi */
+  loadKey();
 })();

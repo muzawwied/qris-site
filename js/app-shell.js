@@ -14,6 +14,7 @@
   var path = location.pathname.replace(/\/index\.html$/, '/');
   if (path.charAt(path.length - 1) !== '/') path += '/';
   var current = path;
+  if (path.indexOf('/app/penarikan/') === 0) current = '/app/penarikan/';
 
   function icon(path) {
     return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="' + path + '"/></svg>';

@@ -52,13 +52,30 @@
       });
   });
 
-  document.addEventListener('session', function (ev) {
-    var user = ev.detail.user;
+  function handleSession(user) {
     if (!user) { gate.hidden = false; content.hidden = true; return; }
     gate.hidden = true; content.hidden = false;
     $('#helloLine').textContent = 'Selamat datang, ' + (user.business_name || user.email) + '.';
     loadAll();
-  });
+    loadSaldo();
+  }
+
+  document.addEventListener('session', function (ev) { handleSession(ev.detail.user); });
+
+  /* jangan bergantung pada event saja: ambil sesi langsung */
+  fetch('/api/auth/me', { credentials: 'same-origin' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { handleSession(d && d.user); })
+    .catch(function () { gate.hidden = false; content.hidden = true; });
+
+  function loadSaldo() {
+    var el = document.getElementById('ctaSaldo');
+    if (!el) return;
+    fetch('/api/me/withdrawals', { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d && d.balance) el.textContent = fmt(d.balance.available); })
+      .catch(function () {});
+  }
 
   /* ---------- Data ---------- */
   function loadAll() {
