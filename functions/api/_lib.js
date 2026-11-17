@@ -398,22 +398,63 @@ export function publicUser(u) {
     email: u.email,
     business_name: u.business_name,
     plan: u.plan || 'warung',
+    merchant_id: u.merchant_id || null,
     api_key: u.api_key || null,
     created_at: u.created_at,
   };
 }
 
-// Pemilik transaksi: sesi login, atau Authorization: Bearer <api_key>
+// Pemilik transaksi: sesi login, atau pasangan Bearer <api_key> + X-Merchant-Id.
+// Kalau Authorization dikirim tapi pasangannya tidak lengkap/salah, lempar 401
+// supaya pemanggil tahu kredensialnya kurang, bukan diam-diam dianggap tamu.
 export async function ownerFromRequest(request, env) {
   const user = await currentUser(request, env);
   if (user) return user;
+
   const h = request.headers.get('authorization') || '';
   const key = h.replace(/^Bearer\s+/i, '').trim();
-  if (key && key !== adminToken(env)) {
-    const row = await env.DB.prepare('SELECT * FROM users WHERE api_key = ? LIMIT 1').bind(key).first();
-    if (row) return row;
+  if (!key) return null;
+  if (key === adminToken(env)) return null;
+
+  const row = await env.DB.prepare('SELECT * FROM users WHERE api_key = ? LIMIT 1').bind(key).first();
+  if (!row) {
+    const err = new Error('API key tidak dikenal.');
+    err.status = 401;
+    throw err;
   }
-  return null;
+
+  const mid =
+    request.headers.get('x-merchant-id') ||
+    new URL(request.url).searchParams.get('merchant_id') ||
+    '';
+  if (!String(mid).trim()) {
+    const err = new Error('Sertakan X-Merchant-Id milikmu bersama API key.');
+    err.status = 401;
+    throw err;
+  }
+  if (String(mid).trim() !== String(row.merchant_id || '')) {
+    const err = new Error('X-Merchant-Id tidak cocok dengan API key ini.');
+    err.status = 401;
+    throw err;
+  }
+  return row;
+}
+
+export async function ensureUsersMerchantId(env) {
+  try {
+    await env.DB.prepare('ALTER TABLE users ADD COLUMN merchant_id TEXT').run();
+  } catch (e) {
+    /* sudah ada */
+  }
+  const rows = await env.DB.prepare("SELECT id FROM users WHERE merchant_id IS NULL OR merchant_id = ''").all();
+  for (const r of rows.results || []) {
+    await env.DB.prepare('UPDATE users SET merchant_id = ? WHERE id = ?')
+      .bind('mch_' + randomToken(10), r.id).run();
+  }
+}
+
+export function newMerchantId() {
+  return 'mch_' + randomToken(10);
 }
 
 export async function ensurePaymentsUserId(env) {

@@ -131,3 +131,11 @@
   .table th, .table td { padding: 10px 8px; }
   .table th:nth-child(1), .table td:nth-child(1) { display: none; }
 }
+
+.cred { margin-top: 16px; }
+.cred:first-of-type { margin-top: 0; }
+.cred__label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.cred__row { display: flex; align-items: center; gap: 8px; }
+.cred__row .keybox { flex: 1; min-width: 0; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex: 0 0 auto; border: 1px solid var(--line-strong); background: var(--paper); border-radius: var(--r-sm); color: var(--ink); cursor: pointer; }
+.icon-btn:hover { background: rgba(23,22,15,.05); }

@@ -1,6 +1,6 @@
 import {
-  ensureSchema, ensurePaymentsUserId, json, cors, readJson, nowIso, newId, randomToken,
-  hashPassword, createSession, sessionCookie, publicUser,
+  ensureSchema, ensurePaymentsUserId, ensureUsersMerchantId, newMerchantId, json, cors,
+  readJson, nowIso, newId, randomToken, hashPassword, createSession, sessionCookie, publicUser,
 } from '../_lib.js';
 
 export async function onRequestOptions() { return cors(); }
@@ -9,6 +9,7 @@ export async function onRequestOptions() { return cors(); }
 export async function onRequestPost({ request, env }) {
   await ensureSchema(env);
   await ensurePaymentsUserId(env);
+  await ensureUsersMerchantId(env);
 
   const body = await readJson(request);
   if (!body) return json({ error: 'Body harus JSON.' }, 400);
@@ -28,15 +29,16 @@ export async function onRequestPost({ request, env }) {
   const ts = nowIso();
   const hash = await hashPassword(password);
   const apiKey = 'qsk_' + randomToken(20);
+  const merchantId = newMerchantId();
 
   await env.DB.prepare(
-    'INSERT INTO users (id, email, password_hash, business_name, api_key, plan, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-  ).bind(id, email, hash, business, apiKey, 'warung', ts, ts).run();
+    'INSERT INTO users (id, email, password_hash, business_name, api_key, merchant_id, plan, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  ).bind(id, email, hash, business, apiKey, merchantId, 'warung', ts, ts).run();
 
   const token = await createSession(env, id);
 
   return json(
-    { ok: true, user: { id, email, business_name: business, plan: 'warung', api_key: apiKey, created_at: ts } },
+    { ok: true, user: { id, email, business_name: business, plan: 'warung', api_key: apiKey, merchant_id: merchantId, created_at: ts } },
     201,
     { 'Set-Cookie': sessionCookie(token) }
   );

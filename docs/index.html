@@ -135,13 +135,28 @@ if (req.headers['x-signature'] !== expected) {
     <pre>curl https://qris-site.pages.dev/api/payments?status=paid&amp;limit=20 \
   -H "Authorization: Bearer $ADMIN_TOKEN"</pre>
 
+    <h2 id="kredensial">Kredensial</h2>
+    <p>Setiap akun punya dua nilai. Kirim keduanya di header pada setiap permintaan tulis:</p>
+    <table class="doc-table">
+      <thead><tr><th>Nilai</th><th>Header</th><th>Contoh</th></tr></thead>
+      <tbody>
+        <tr><td><code>Merchant ID</code></td><td><code>X-Merchant-Id</code></td><td><code>mch_9f2c1a7b0d</code></td></tr>
+        <tr><td><code>API key</code></td><td><code>Authorization: Bearer</code></td><td><code>qsk_...</code></td></tr>
+      </tbody>
+    </table>
+    <p>API key hanya boleh disimpan di server. Kalau salah satu nilai hilang atau tidak cocok, API membalas <code>401</code> dengan pesan yang jelas.</p>
+
     <h2 id="contoh">Contoh kode</h2>
     <p>Membuat tagihan dari server Node, lalu menunggu status lunas:</p>
     <pre>const base = 'https://qris-site.pages.dev';
 
 const res = await fetch(base + '/api/pay', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + process.env.QRIS_API_KEY,
+    'X-Merchant-Id': process.env.QRIS_MERCHANT_ID
+  },
   body: JSON.stringify({ amount: 150000, reference: 'INV-1024' })
 });
 const pay = await res.json();

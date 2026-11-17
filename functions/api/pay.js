@@ -1,6 +1,6 @@
 import {
   ensureSchema, ensurePaymentsUserId, json, cors, readJson, mode, newId, nowIso, feeFor,
-  createQris, logEvent, publicPayment, qrImageUrl, ownerFromRequest,
+  createQris, logEvent, publicPayment, qrImageUrl, ownerFromRequest, ensureUsersMerchantId,
 } from './_lib.js';
 
 export async function onRequestOptions() {
@@ -12,11 +12,19 @@ export async function onRequestOptions() {
 export async function onRequestPost({ request, env }) {
   await ensureSchema(env);
   await ensurePaymentsUserId(env);
+  await ensureUsersMerchantId(env);
 
   // Pemilik tagihan: user yang login (cookie) atau Bearer API key. Boleh kosong
   // untuk pemakaian publik tanpa akun (mode demo / tamu).
   let owner = null;
-  try { owner = await ownerFromRequest(request, env); } catch (e) { owner = null; }
+  try {
+    owner = await ownerFromRequest(request, env);
+  } catch (e) {
+    if (e && e.status === 401 && (request.headers.get('authorization') || '')) {
+      return json({ error: e.message }, 401);
+    }
+    owner = null;
+  }
 
   const body = await readJson(request);
   if (!body) return json({ error: 'Body harus JSON.' }, 400);

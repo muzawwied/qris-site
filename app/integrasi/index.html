@@ -21,15 +21,35 @@
 
     <div class="panel">
       <div class="panel__head">
-        <div><h2>API key</h2><p>Pakai di header Authorization saat memanggil API dari servermu.</p></div>
-        <div style="display:flex;gap:8px"><button class="btn btn--ghost btn--sm" id="copyKey">Salin</button><button class="btn btn--ghost btn--sm" id="rotateKey">Ganti key</button></div>
+        <div><h2>Kredensial integrasi</h2><p>Integrasi butuh dua nilai: Merchant ID dan API key. Kirim keduanya di setiap permintaan.</p></div>
+        <div><button class="btn btn--ghost btn--sm" id="rotateKey">Ganti API key</button></div>
       </div>
-      <div class="keybox" id="apiKeyBox">memuat…</div>
+
+      <div class="cred">
+        <div class="cred__label">Merchant ID</div>
+        <div class="cred__row">
+          <div class="keybox" id="merchantBox">memuat…</div>
+          <button class="btn btn--ghost btn--sm" id="copyMerchant">Salin</button>
+        </div>
+      </div>
+
+      <div class="cred">
+        <div class="cred__label">API key</div>
+        <div class="cred__row">
+          <div class="keybox" id="apiKeyBox">memuat…</div>
+          <button class="icon-btn" id="toggleKey" type="button" aria-label="Tampilkan API key" title="Tampilkan API key">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.8 12S5.4 5.4 12 5.4 22.2 12 22.2 12 18.6 18.6 12 18.6 1.8 12 1.8 12Z"/><circle cx="12" cy="12" r="3.1"/></svg>
+          </button>
+          <button class="btn btn--ghost btn--sm" id="copyKey">Salin</button>
+        </div>
+      </div>
+
       <pre style="margin-top:16px">curl -X POST https://qris-site.pages.dev/api/pay \
   -H "Authorization: Bearer &lt;api_key&gt;" \
+  -H "X-Merchant-Id: &lt;merchant_id&gt;" \
   -H "Content-Type: application/json" \
   -d '{"amount":150000,"reference":"INV-1024"}'</pre>
-      <p class="muted" style="font-size:12px;margin:0">Jangan menaruh key ini di kode frontend. Simpan di environment server.</p>
+      <p class="muted" style="font-size:12px;margin:0">Jangan menaruh dua nilai ini di kode frontend. Simpan di environment server.</p>
     </div>
 
     <div class="grid-2" style="margin-top:18px">
@@ -63,6 +83,6 @@
 </div>
 <div class="toast" id="toast"></div>
 <script src="/js/app-shell.js"></script>
-<script src="/js/page-integrasi.js?v=4"></script>
+<script src="/js/page-integrasi.js?v=5"></script>
 </body>
 </html>
