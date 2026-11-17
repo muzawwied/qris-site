@@ -15,6 +15,7 @@
     $('#tabRegister').classList.toggle('is-on', t === 'register');
     $('#bizField').hidden = t !== 'register';
     $('#pwHint').hidden = t !== 'register';
+    $('#forgotRow').hidden = t !== 'login';
     $('#authBtn').textContent = t === 'register' ? 'Buat akun' : 'Masuk';
     $('#authHeadline').textContent = t === 'register' ? 'Buat akun usahamu.' : 'Masuk ke akunmu.';
     $('#authSub').textContent = t === 'register'

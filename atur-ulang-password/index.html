@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Atur ulang password — Clinqoo</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=3">
+<link rel="stylesheet" href="/css/auth.css?v=2">
+</head>
+<body class="auth-body">
+<div class="auth2">
+  <aside class="auth2__art">
+    <a class="auth2__brand" href="/"><img src="/assets/brand/icon-48.png" alt=""> <span>Clinqoo</span></a>
+    <div class="auth2__claim">
+      <p class="auth2__eyebrow">Keamanan akun</p>
+      <h2>Password baru,<br>akses kembali.</h2>
+      <p>Setelah password diganti, semua perangkat yang masih masuk akan otomatis keluar demi keamanan.</p>
+    </div>
+    <ul class="auth2__list">
+      <li><b>8+</b><span>Minimal delapan karakter</span></li>
+      <li><b>1x</b><span>Tautan ini langsung mati</span></li>
+      <li><b>Aman</b><span>Sesi lama diputus otomatis</span></li>
+    </ul>
+  </aside>
+
+  <section class="auth2__side">
+    <div class="auth2__form">
+      <div class="auth2__head">
+        <p class="eyebrow">Akun usaha</p>
+        <h1>Buat password baru.</h1>
+        <p id="resetSub">Masukkan password baru untuk akunmu.</p>
+      </div>
+
+      <form id="resetForm">
+        <div class="field">
+          <label for="password">Password baru</label>
+          <div class="pwfield">
+            <input id="password" type="password" minlength="8" autocomplete="new-password" placeholder="Minimal 8 karakter" required>
+            <button class="pwfield__eye" id="togglePw" type="button" aria-label="Tampilkan password">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.8 12S5.4 5.4 12 5.4 22.2 12 22.2 12 18.6 18.6 12 18.6 1.8 12 1.8 12Z"/><circle cx="12" cy="12" r="3.1"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="password2">Ulangi password</label>
+          <input id="password2" type="password" minlength="8" autocomplete="new-password" placeholder="Ketik sekali lagi" required>
+        </div>
+        <div id="resetMsg" class="banner banner--err" hidden></div>
+        <button class="btn btn--block" type="submit" id="resetBtn">Simpan password</button>
+      </form>
+
+      <p class="auth2__back"><a href="/lupa-password/" id="newLink">Minta tautan baru</a></p>
+    </div>
+  </section>
+</div>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var token = new URLSearchParams(location.search).get('t') || '';
+
+  if (!token) {
+    $('#resetForm').hidden = true;
+    $('#resetSub').textContent = 'Tautan tidak lengkap. Minta tautan baru lewat halaman lupa password.';
+  }
+
+  var eye = $('#togglePw');
+  eye.addEventListener('click', function () {
+    var i = $('#password');
+    var show = i.type === 'password';
+    i.type = show ? 'text' : 'password';
+    eye.style.color = show ? 'var(--ink)' : '';
+  });
+
+  $('#resetForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var btn = $('#resetBtn'), msg = $('#resetMsg');
+    if ($('#password').value !== $('#password2').value) {
+      msg.hidden = false; msg.textContent = 'Dua password belum sama.';
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Menyimpan…'; msg.hidden = true;
+    fetch('/api/auth/reset', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token, password: $('#password').value })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.d.error || 'Gagal menyimpan.');
+        btn.textContent = 'Password tersimpan';
+        location.replace('/app/');
+      })
+      .catch(function (err) {
+        msg.hidden = false; msg.textContent = err.message;
+        btn.disabled = false; btn.textContent = 'Simpan password';
+      });
+  });
+})();
+</script>
+</body>
+</html>

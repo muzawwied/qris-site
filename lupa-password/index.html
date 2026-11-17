@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Lupa password — Clinqoo</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=3">
+<link rel="stylesheet" href="/css/auth.css?v=2">
+</head>
+<body class="auth-body">
+<div class="auth2">
+  <aside class="auth2__art">
+    <a class="auth2__brand" href="/"><img src="/assets/brand/icon-48.png" alt=""> <span>Clinqoo</span></a>
+    <div class="auth2__claim">
+      <p class="auth2__eyebrow">Keamanan akun</p>
+      <h2>Lupa password<br>bukan masalah.</h2>
+      <p>Kami kirim tautan aman ke emailmu. Tautan berlaku 30 menit dan hanya bisa dipakai sekali.</p>
+    </div>
+    <ul class="auth2__list">
+      <li><b>30 menit</b><span>Masa berlaku tautan atur ulang</span></li>
+      <li><b>Sekali</b><span>Tautan mati setelah dipakai</span></li>
+      <li><b>Semua</b><span>Perangkat lain otomatis keluar</span></li>
+    </ul>
+  </aside>
+
+  <section class="auth2__side">
+    <div class="auth2__form">
+      <div class="auth2__head">
+        <p class="eyebrow">Akun usaha</p>
+        <h1>Lupa password?</h1>
+        <p>Masukkan email yang kamu pakai mendaftar. Kami kirim tautan untuk membuat password baru.</p>
+      </div>
+
+      <form id="forgotForm">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="kamu@usaha.id" required>
+        </div>
+        <div id="forgotMsg" class="banner banner--err" hidden></div>
+        <button class="btn btn--block" type="submit" id="forgotBtn">Kirim tautan</button>
+      </form>
+
+      <div id="sentBox" hidden style="margin-top:4px">
+        <p class="muted" id="sentText" style="font-size:13px;line-height:1.65"></p>
+        <a class="btn btn--block" id="devLink" href="#" hidden style="margin-top:12px">Buka tautan atur ulang</a>
+        <button class="btn btn--ghost btn--block" id="againBtn" type="button" style="margin-top:10px">Kirim ulang</button>
+      </div>
+
+      <p class="auth2__back"><a href="/masuk/">Kembali ke halaman masuk</a></p>
+    </div>
+  </section>
+</div>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  $('#forgotForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var btn = $('#forgotBtn'), msg = $('#forgotMsg');
+    btn.disabled = true; btn.textContent = 'Mengirim…'; msg.hidden = true;
+    fetch('/api/auth/forgot', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: $('#email').value })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.d.error || 'Gagal mengirim.');
+        $('#forgotForm').hidden = true;
+        $('#sentBox').hidden = false;
+        $('#sentText').textContent = res.d.message || 'Kalau email itu terdaftar, tautan atur ulang sudah dikirim.';
+        if (res.d.dev_link) { var a = $('#devLink'); a.href = res.d.dev_link; a.hidden = false; }
+        btn.disabled = false; btn.textContent = 'Kirim tautan';
+      })
+      .catch(function (err) {
+        msg.hidden = false; msg.textContent = err.message;
+        btn.disabled = false; btn.textContent = 'Kirim tautan';
+      });
+  });
+  $('#againBtn').addEventListener('click', function () {
+    $('#sentBox').hidden = true; $('#forgotForm').hidden = false; $('#devLink').hidden = true;
+  });
+})();
+</script>
+</body>
+</html>
