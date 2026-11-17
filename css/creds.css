@@ -39,3 +39,15 @@
 }
 
 .keybox--withicon .keybox__eye svg { display: block; }
+
+/* Playground uji cepat */
+.play { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+.play__field { display: block; padding: 0; }
+.play__field input { width: 100%; border: 0; background: transparent; padding: 13px 15px; font: inherit; color: var(--ink); outline: none; }
+.play__result { border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 16px; background: var(--paper); min-height: 190px; display: flex; flex-direction: column; justify-content: center; }
+.play__qr { width: 100%; aspect-ratio: 1 / 1; border: 1px solid var(--line-strong); background: #fff; object-fit: contain; }
+.play__amount { font-family: var(--serif); font-size: 26px; line-height: 1.1; margin: 12px 0 4px; }
+.play__meta { font-size: 12px; color: var(--muted); font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
+.chip { display: inline-block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--line-strong); border-radius: 999px; }
+.chip--paid { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+@media (max-width: 720px) { .play { grid-template-columns: 1fr; } }

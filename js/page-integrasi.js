@@ -70,6 +70,82 @@
       .catch(function () { toast('Gagal membuat key.'); });
   });
 
+
+  /* Playground: buat tagihan uji lalu pantau statusnya */
+  var pgTimer = null, pgId = null;
+  function rupiah(n) { return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID'); }
+
+  function pgRender(d) {
+    var box = $('#pgResult');
+    if (!d) { box.innerHTML = '<p class="muted" style="margin:0;font-size:13px">Belum ada tagihan uji.</p>'; return; }
+    var paid = d.status === 'paid';
+    var img = d.qr_image || d.qr_url || '';
+    box.innerHTML =
+      (paid ? '' : (img ? '<img class="play__qr" src="' + img + '" alt="QRIS tagihan uji">' : '')) +
+      '<div class="play__amount">' + rupiah(d.amount) + '</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+        '<span class="chip ' + (paid ? 'chip--paid' : '') + '">' + String(d.status || 'pending').toUpperCase() + '</span>' +
+        '<span class="play__meta">fee ' + rupiah(d.fee) + '</span>' +
+      '</div>' +
+      '<div class="play__meta" style="margin-top:8px">' + (d.id || '') + '</div>' +
+      (paid ? '' :
+        '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">' +
+          '<a class="btn btn--ghost btn--sm" href="' + (d.checkout_url || ('/bayar/' + d.id)) + '" target="_blank" rel="noopener">Buka halaman bayar</a>' +
+          '<button class="btn btn--ghost btn--sm" id="pgSim">Simulasikan lunas</button>' +
+        '</div>') +
+      (paid ? '<p class="muted" style="font-size:12px;margin:10px 0 0">Lunas. Saldo akun ikut bertambah.</p>' : '');
+    var sim = $('#pgSim');
+    if (sim) sim.addEventListener('click', function () {
+      sim.disabled = true;
+      fetch('/api/demo-pay', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: d.id }) })
+        .then(function (r) { return r.json(); })
+        .then(function () { pgPoll(); })
+        .catch(function () { sim.disabled = false; });
+    });
+  }
+
+  function pgPoll() {
+    if (!pgId) return;
+    fetch('/api/pay/' + encodeURIComponent(pgId))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || d.error) return;
+        pgRender(d);
+        if (d.status === 'paid' || d.status === 'expired' || d.status === 'failed') {
+          if (pgTimer) { clearInterval(pgTimer); pgTimer = null; }
+        }
+      })
+      .catch(function () {});
+  }
+
+  function pgBuat() {
+    var btn = $('#pgRun');
+    var amount = parseInt(($('#pgAmount').value || '').replace(/[^0-9]/g, ''), 10);
+    var desc = ($('#pgDesc').value || '').trim();
+    if (!amount || amount < 1000) { toast('Nominal minimal Rp 1.000.'); return; }
+    btn.disabled = true;
+    btn.textContent = 'Membuat…';
+    fetch('/api/pay', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: amount, description: desc || null })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        btn.disabled = false;
+        btn.textContent = 'Buat tagihan uji';
+        if (d.error) { toast(d.error); return; }
+        pgId = d.id;
+        pgRender(d);
+        if (pgTimer) clearInterval(pgTimer);
+        pgTimer = setInterval(pgPoll, 3000);
+        toast('Tagihan uji dibuat.');
+      })
+      .catch(function () { btn.disabled = false; btn.textContent = 'Buat tagihan uji'; toast('Gagal membuat tagihan.'); });
+  }
+
+  if ($('#pgRun')) $('#pgRun').addEventListener('click', pgBuat);
+
   fetch('/api/health').then(function (r) { return r.json(); }).then(function (h) {
     $('#hApi').textContent = h.ok ? 'Normal' : 'Gangguan';
     $('#hDb').textContent = h.db === 'ok' ? 'Terhubung' : 'Error';

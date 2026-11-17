@@ -55,6 +55,23 @@
       <p class="muted" style="font-size:12px;margin:0">Jangan menaruh dua nilai ini di kode frontend. Simpan di environment server.</p>
     </div>
 
+    <div class="panel" style="margin-top:18px">
+      <div class="panel__head">
+        <div><h2>Uji cepat</h2><p>Buat tagihan sungguhan di akunmu tanpa terminal, lalu lihat statusnya berubah sendiri.</p></div>
+      </div>
+      <div class="play">
+        <div>
+          <div class="cred__label">Nominal (Rp)</div>
+          <label class="keybox play__field"><input id="pgAmount" inputmode="numeric" value="15000" autocomplete="off"></label>
+          <div class="cred__label" style="margin-top:12px">Keterangan</div>
+          <label class="keybox play__field"><input id="pgDesc" placeholder="INV-1024" autocomplete="off"></label>
+          <button class="btn btn--sm" id="pgRun" style="margin-top:14px">Buat tagihan uji</button>
+          <p class="muted" id="pgNote" style="font-size:12px;margin:10px 0 0">Tagihan uji tercatat di menu Transaksi seperti tagihan biasa.</p>
+        </div>
+        <div class="play__result" id="pgResult"><p class="muted" style="margin:0;font-size:13px">Belum ada tagihan uji.</p></div>
+      </div>
+    </div>
+
     <div class="grid-2" style="margin-top:18px">
       <div class="panel">
         <div class="panel__head"><div><h2>Webhook</h2><p>Provider memanggil endpoint ini saat status berubah.</p></div></div>
@@ -86,6 +103,6 @@
 </div>
 <div class="toast" id="toast"></div>
 <script src="/js/app-shell.js"></script>
-<script src="/js/page-integrasi.js?v=6"></script>
+<script src="/js/page-integrasi.js?v=7"></script>
 </body>
 </html>
