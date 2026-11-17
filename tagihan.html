@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Buat tagihan — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <div class="topbar">
+      <div><h1>Buat tagihan</h1><p>QR dinamis dengan nominal pas. Tagihan tercatat di akunmu.</p></div>
+    </div>
+
+    <div class="grid-2" style="align-items:start">
+      <div class="panel">
+        <form id="createForm">
+          <div class="field">
+            <label for="amount">Nominal tagihan (Rp)</label>
+            <input id="amount" type="number" inputmode="numeric" min="1000" step="500" value="150000" required>
+            <div class="field__hint">Minimal Rp 1.000 · maksimal Rp 100.000.000</div>
+          </div>
+          <div class="field">
+            <label>Nominal cepat</label>
+            <div class="chips" id="quickAmounts">
+              <button type="button" class="chip" data-amount="25000">Rp 25.000</button>
+              <button type="button" class="chip" data-amount="75000">Rp 75.000</button>
+              <button type="button" class="chip is-active" data-amount="150000">Rp 150.000</button>
+              <button type="button" class="chip" data-amount="500000">Rp 500.000</button>
+            </div>
+          </div>
+          <div class="field"><label for="description">Keterangan pesanan</label><input id="description" type="text" maxlength="120" placeholder="Pesanan #1024 · Kopi Susu 2×"></div>
+          <div class="field-row">
+            <div class="field"><label for="reference">Referensi</label><input id="reference" type="text" maxlength="60" placeholder="INV-1024"></div>
+            <div class="field"><label for="buyerName">Nama pembeli</label><input id="buyerName" type="text" maxlength="80" placeholder="Budi"></div>
+          </div>
+          <div id="msg" class="banner banner--err" hidden></div>
+          <button class="btn btn--block" type="submit" id="submitBtn">Buat QRIS</button>
+        </form>
+      </div>
+
+      <div class="panel" id="resultPanel" hidden>
+        <div class="panel__head">
+          <div><h2>Tagihan siap</h2><p id="resultSub">Bagikan QR atau link ke pembeli.</p></div>
+          <span class="status-label status-label--wait"><i></i> menunggu</span>
+        </div>
+        <img id="qrImg" alt="QRIS" style="width:220px;height:220px;border:1px solid var(--line);border-radius:3px;padding:8px;background:#fff;margin:0 auto 16px">
+        <div style="text-align:center;font-family:var(--serif);font-size:28px" id="resAmount">—</div>
+        <div class="kv">
+          <div class="kv__row"><span>Nomor tagihan</span><b class="mono" id="resId">—</b></div>
+          <div class="kv__row"><span>Biaya 0,7%</span><b id="resFee">—</b></div>
+          <div class="kv__row"><span>Masuk ke kamu</span><b id="resNet" style="color:var(--money)">—</b></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+          <a class="btn btn--ghost btn--sm" id="openCheckout" href="#" target="_blank" rel="noopener">Buka checkout</a>
+          <button class="btn btn--sm" id="copyLink" type="button">Salin tautan</button>
+          <a class="btn btn--ghost btn--sm" id="viewQr" href="#" target="_blank" rel="noopener">QR publik</a>
+          <button class="btn btn--ghost btn--sm" id="shareQris" type="button">Bagikan</button>
+        </div>
+        <p class="muted" style="font-size:12px;margin-top:12px">Masa berlaku 15 menit sejak dibuat.</p>
+      </div>
+
+      <div class="panel" id="hintPanel">
+        <div class="panel__head"><div><h2>Belum ada tagihan</h2><p>Isi nominal di sebelah, QR langsung jadi.</p></div></div>
+        <ul style="margin:0;padding-left:18px;display:grid;gap:9px;font-size:13.5px;color:var(--ink-soft)">
+          <li>Pembeli bisa scan dari aplikasi apa pun.</li>
+          <li>Status berubah otomatis saat lunas.</li>
+          <li>Link checkout bisa dibagikan lewat WhatsApp.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="js/app-shell.js"></script>
+<script src="js/page-tagihan.js"></script>
+</body>
+</html>

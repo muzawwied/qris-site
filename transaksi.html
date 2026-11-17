@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Transaksi — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <div class="topbar">
+      <div><h1>Transaksi</h1><p>Semua tagihan di akunmu, lengkap dengan status dan biaya.</p></div>
+      <div class="topbar__actions"><a class="btn btn--sm" href="tagihan.html">Buat tagihan</a></div>
+    </div>
+
+    <div class="stats" style="margin-bottom:18px">
+      <div class="stat"><span>Diterima hari ini</span><b class="money" id="sToday">Rp 0</b></div>
+      <div class="stat"><span>Total diterima</span><b id="sGross">Rp 0</b></div>
+      <div class="stat"><span>Biaya</span><b id="sFee">Rp 0</b></div>
+      <div class="stat"><span>Menunggu</span><b id="sPending">0</b></div>
+    </div>
+
+    <div class="panel" style="padding:0;overflow:hidden">
+      <div class="toolbar" style="padding:16px 18px 0;margin-bottom:10px">
+        <input id="q" type="search" placeholder="Cari ID, referensi, atau keterangan…">
+        <select id="statusFilter">
+          <option value="all">Semua status</option>
+          <option value="paid">Dibayar</option>
+          <option value="pending">Menunggu</option>
+          <option value="expired">Kedaluwarsa</option>
+          <option value="failed">Gagal</option>
+        </select>
+        <button class="btn btn--ghost btn--sm" id="refreshBtn">Muat ulang</button>
+      </div>
+      <div class="tablewrap" style="border:0;border-top:1px solid var(--line);border-radius:0">
+        <table class="data">
+          <thead><tr><th>Dibuat</th><th>Tagihan</th><th>Keterangan</th><th style="text-align:right">Nominal</th><th style="text-align:right">Biaya</th><th>Status</th><th></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden>Belum ada transaksi yang cocok.</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px">
+        <span class="muted" style="font-size:12.5px" id="countInfo"></span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn--ghost btn--sm" id="prevBtn">Sebelumnya</button>
+          <button class="btn btn--ghost btn--sm" id="nextBtn">Berikutnya</button>
+        </div>
+      </div>
+    </div>
+    <div id="dashError" class="banner banner--err" hidden style="margin-top:16px"></div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="js/app-shell.js"></script>
+<script src="js/page-transaksi.js"></script>
+</body>
+</html>

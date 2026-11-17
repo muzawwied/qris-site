@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Integrasi &amp; API — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <div class="topbar">
+      <div><h1>Integrasi &amp; API</h1><p>Kunci akses, webhook, dan contoh pemanggilan.</p></div>
+      <div class="topbar__actions"><a class="btn btn--ghost btn--sm" href="api.html">Dokumentasi lengkap</a></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel__head">
+        <div><h2>API key</h2><p>Pakai di header Authorization saat memanggil API dari servermu.</p></div>
+        <div style="display:flex;gap:8px"><button class="btn btn--ghost btn--sm" id="copyKey">Salin</button><button class="btn btn--ghost btn--sm" id="rotateKey">Ganti key</button></div>
+      </div>
+      <div class="keybox" id="apiKeyBox">memuat…</div>
+      <pre style="margin-top:16px">curl -X POST https://qris-site.pages.dev/api/pay \
+  -H "Authorization: Bearer &lt;api_key&gt;" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":150000,"reference":"INV-1024"}'</pre>
+      <p class="muted" style="font-size:12px;margin:0">Jangan menaruh key ini di kode frontend. Simpan di environment server.</p>
+    </div>
+
+    <div class="grid-2" style="margin-top:18px">
+      <div class="panel">
+        <div class="panel__head"><div><h2>Webhook</h2><p>Provider memanggil endpoint ini saat status berubah.</p></div></div>
+        <div class="keybox">https://qris-site.pages.dev/api/webhook</div>
+        <div class="kv" style="margin-top:14px">
+          <div class="kv__row"><span>Verifikasi</span><b>HMAC SHA-256</b></div>
+          <div class="kv__row"><span>Header</span><b class="mono">X-Signature</b></div>
+          <div class="kv__row"><span>Alternatif</span><b class="mono">X-Webhook-Token</b></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel__head"><div><h2>Status layanan</h2><p>Diperiksa langsung.</p></div></div>
+        <div class="kv">
+          <div class="kv__row"><span>API</span><b id="hApi">memeriksa…</b></div>
+          <div class="kv__row"><span>Database</span><b id="hDb">memeriksa…</b></div>
+          <div class="kv__row"><span>Mode</span><b id="hMode">—</b></div>
+        </div>
+        <p class="muted" style="font-size:12px;margin-top:14px">Selama mode percobaan, pembayaran bisa disimulasikan dari halaman checkout.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:18px">
+      <div class="panel__head"><div><h2>Alur singkat</h2><p>Tiga panggilan, selesai.</p></div></div>
+      <ol style="margin:0;padding-left:18px;display:grid;gap:10px;font-size:13.5px;color:var(--ink-soft)">
+        <li><b>POST /api/pay</b> — buat tagihan, dapat <span class="code-inline">qr_image</span> dan <span class="code-inline">checkout_url</span>.</li>
+        <li><b>GET /api/pay/{id}</b> — cek status, atau tunggu webhook.</li>
+        <li><b>POST /api/webhook</b> — dipanggil provider, status jadi <span class="code-inline">paid</span>.</li>
+      </ol>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="js/app-shell.js"></script>
+<script src="js/page-integrasi.js"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Ringkasan — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+
+    <!-- Gerbang login -->
+    <section id="gate" hidden>
+      <div class="auth">
+        <p class="eyebrow">Akun usaha</p>
+        <h1 class="h2" style="font-size:32px">Masuk untuk kelola pembayaran.</h1>
+        <p class="muted" style="font-size:14px;margin-top:10px">Semua tagihan yang kamu buat akan tercatat di akun ini.</p>
+
+        <div class="panel" style="margin-top:22px">
+          <div class="auth__switch">
+            <button type="button" id="tabLogin" class="is-on">Masuk</button>
+            <button type="button" id="tabRegister">Daftar</button>
+          </div>
+          <form id="authForm">
+            <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="kamu@usaha.id" required></div>
+            <div class="field" id="bizField" hidden><label for="business">Nama usaha</label><input id="business" type="text" maxlength="80" placeholder="Kedai Kopi Senja"></div>
+            <div class="field"><label for="password">Password</label><input id="password" type="password" minlength="8" autocomplete="current-password" placeholder="Minimal 8 karakter" required></div>
+            <div id="authMsg" class="banner banner--err" hidden></div>
+            <button class="btn btn--block" type="submit" id="authBtn">Masuk</button>
+          </form>
+        </div>
+        <p class="muted" style="font-size:12px;margin-top:14px">Dengan mendaftar, kamu setuju pada <a class="link-u" href="legal.html" style="font-size:12px">syarat layanan</a>.</p>
+      </div>
+    </section>
+
+    <!-- Isi dashboard -->
+    <section id="pageContent" hidden>
+      <div class="topbar">
+        <div>
+          <h1 class="h1" style="font-size:clamp(26px,3.4vw,36px)">Ringkasan</h1>
+          <p id="helloLine">Selamat datang kembali.</p>
+        </div>
+        <div class="topbar__actions">
+          <span class="status-label status-label--wait" id="modeLabel"><i></i> memuat</span>
+          <a class="btn btn--sm" href="tagihan.html">Buat tagihan</a>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>Diterima hari ini</span><b class="money" id="sToday">Rp 0</b></div>
+        <div class="stat"><span>Total diterima</span><b id="sGross">Rp 0</b></div>
+        <div class="stat"><span>Biaya terkumpul</span><b id="sFee">Rp 0</b></div>
+        <div class="stat"><span>Menunggu bayar</span><b id="sPending">0</b></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Transaksi terakhir</h2><p>Lima tagihan paling baru di akunmu.</p></div>
+          <a class="link-u" href="transaksi.html" style="font-size:13px">Lihat semua</a>
+        </div>
+        <div class="tablewrap">
+          <table class="data">
+            <thead><tr><th>Dibuat</th><th>Tagihan</th><th style="text-align:right">Nominal</th><th>Status</th><th></th></tr></thead>
+            <tbody id="recentRows"></tbody>
+          </table>
+          <div class="empty" id="recentEmpty" hidden>Belum ada transaksi. Buat tagihan pertamamu.</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:18px">
+        <div class="panel">
+          <div class="panel__head"><div><h2>Langkah berikutnya</h2><p>Supaya pembayaran langsung masuk.</p></div></div>
+          <ol style="margin:0;padding-left:18px;display:grid;gap:9px;font-size:13.5px;color:var(--ink-soft)">
+            <li>Pasang kredensial provider QRIS (mode live).</li>
+            <li>Tempel webhook ke dashboard provider.</li>
+            <li>Ambil API key untuk integrasi tokomu.</li>
+          </ol>
+          <a class="btn btn--ghost btn--sm" href="integrasi.html" style="margin-top:16px">Buka integrasi</a>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><div><h2>Status layanan</h2><p>Diperiksa langsung dari server.</p></div></div>
+          <div class="kv">
+            <div class="kv__row"><span>API</span><b id="hApi">memeriksa…</b></div>
+            <div class="kv__row"><span>Database</span><b id="hDb">memeriksa…</b></div>
+            <div class="kv__row"><span>Mode pembayaran</span><b id="hMode">—</b></div>
+          </div>
+        </div>
+      </div>
+      <div id="dashError" class="banner banner--err" hidden style="margin-top:16px"></div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/app-shell.js"></script>
+<script src="js/page-dashboard.js"></script>
+</body>
+</html>

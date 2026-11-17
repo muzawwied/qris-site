@@ -1,0 +1,411 @@
+// ===== Lib bersama untuk semua endpoint /api/* =====
+// Cloudflare Pages Functions + D1. Tanpa dependency eksternal.
+
+const SCHEMA = `
+CREATE TABLE IF NOT EXISTS payments (
+  id TEXT PRIMARY KEY,
+  reference TEXT,
+  amount INTEGER NOT NULL,
+  fee INTEGER DEFAULT 0,
+  net_amount INTEGER DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'pending',
+  description TEXT,
+  buyer_name TEXT,
+  buyer_email TEXT,
+  method TEXT DEFAULT 'QRIS',
+  issuer TEXT,
+  qr_string TEXT,
+  qr_image TEXT,
+  expires_at TEXT,
+  paid_at TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  raw TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_payments_ref ON payments(reference);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
+CREATE INDEX IF NOT EXISTS idx_payments_created ON payments(created_at);
+CREATE TABLE IF NOT EXISTS events (
+  id TEXT PRIMARY KEY,
+  payment_id TEXT,
+  type TEXT NOT NULL,
+  payload TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_events_payment ON events(payment_id);
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  business_name TEXT,
+  api_key TEXT UNIQUE,
+  plan TEXT DEFAULT 'warung',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sessions (
+  token_hash TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+`;
+
+let schemaReady = false;
+
+export async function ensureSchema(env) {
+  if (schemaReady) return;
+  const stmts = SCHEMA.split(';').map((s) => s.trim()).filter(Boolean);
+  for (const s of stmts) {
+    await env.DB.prepare(s).run();
+  }
+  schemaReady = true;
+}
+
+export function json(data, status = 200, extra = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: Object.assign(
+      {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Signature',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      },
+      extra
+    ),
+  });
+}
+
+export function cors() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Signature',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    },
+  });
+}
+
+export const nowIso = () => new Date().toISOString();
+
+export function newId(prefix = 'pay') {
+  const rand = crypto.getRandomValues(new Uint8Array(8));
+  const hex = Array.from(rand).map((b) => b.toString(16).padStart(2, '0')).join('');
+  return `${prefix}_${Date.now().toString(36)}${hex.slice(0, 8)}`;
+}
+
+export function feeFor(amount, rate) {
+  const r = Number.isFinite(rate) ? rate : 0.007;
+  return Math.round(amount * r);
+}
+
+export async function readJson(request) {
+  try {
+    return await request.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+export function mode(env) {
+  // 'demo' = QR contoh, pembayaran bisa disimulasikan (tanpa uang sungguhan)
+  // 'live' = memanggil provider QRIS asli (butuh QRIS_API_KEY dkk)
+  return String(env.PAYMENT_MODE || (env.QRIS_API_KEY ? 'live' : 'demo')).toLowerCase();
+}
+
+export function adminToken(env) {
+  return String(env.ADMIN_TOKEN || '');
+}
+
+export function isAdmin(request, env) {
+  const want = adminToken(env);
+  if (!want) return false;
+  const h = request.headers.get('authorization') || '';
+  const got = h.replace(/^Bearer\s+/i, '').trim();
+  return got && got === want;
+}
+
+// ===== HMAC SHA-256 dengan Web Crypto =====
+export async function hmacHex(secret, body) {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+export function safeEqual(a, b) {
+  const x = String(a || '');
+  const y = String(b || '');
+  if (x.length !== y.length) return false;
+  let out = 0;
+  for (let i = 0; i < x.length; i++) out |= x.charCodeAt(i) ^ y.charCodeAt(i);
+  return out === 0;
+}
+
+// ===== Adapter provider QRIS (qris.site) =====
+// Semua nama env bisa diatur supaya cocok dengan dokumentasi provider yang dipakai:
+//   QRIS_API_BASE, QRIS_API_KEY, QRIS_MERCHANT_ID, QRIS_CREATE_PATH, QRIS_STATUS_PATH
+// Bentuk respons provider berbeda-beda, jadi pembacaan field dibuat fleksibel.
+export async function createQris(env, payment) {
+  if (mode(env) !== 'live') {
+    return { ok: true, demo: true, qr_string: demoQrString(payment), qr_image: null, provider_id: null };
+  }
+
+  const base = String(env.QRIS_API_BASE || 'https://api.qris.site').replace(/\/+$/, '');
+  const path = String(env.QRIS_CREATE_PATH || '/v1/qris/create');
+  const key = String(env.QRIS_API_KEY || '');
+  if (!key) return { ok: false, error: 'QRIS_API_KEY belum diset.' };
+
+  const body = {
+    merchant_id: env.QRIS_MERCHANT_ID || undefined,
+    amount: payment.amount,
+    reference: payment.reference || payment.id,
+    description: payment.description || 'Pembayaran QRIS',
+    expires_in: 900,
+    callback_url: env.PUBLIC_BASE_URL ? `${String(env.PUBLIC_BASE_URL).replace(/\/+$/, '')}/api/webhook` : undefined,
+  };
+  Object.keys(body).forEach((k) => body[k] === undefined && delete body[k]);
+
+  let res;
+  try {
+    res = await fetch(base + path, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key}`,
+        'X-Api-Key': key,
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    return { ok: false, error: 'Gagal menghubungi provider QRIS: ' + (e && e.message ? e.message : String(e)) };
+  }
+
+  const text = await res.text();
+  let data = {};
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    return { ok: false, error: `Provider mengirim respons non-JSON (HTTP ${res.status}).` };
+  }
+  if (!res.ok) {
+    const msg = (data && (data.message || data.error || data.msg)) || `HTTP ${res.status}`;
+    return { ok: false, error: 'Provider menolak permintaan: ' + msg };
+  }
+
+  const root = data.data || data.payment || data.result || data;
+  const qrString =
+    root.qr_string || root.qrString || root.qris_string || root.qr_code || root.qrCode || root.payload || '';
+  const qrImage =
+    root.qr_image || root.qrImage || root.qr_url || root.qrUrl || root.image_url || root.payment_url || '';
+  const providerId = root.id || root.trx_id || root.transaction_id || root.invoice_id || null;
+
+  if (!qrString && !qrImage) {
+    return { ok: false, error: 'Respons provider tidak berisi QR (qr_string/qr_image).' };
+  }
+  return { ok: true, demo: false, qr_string: qrString || null, qr_image: qrImage || null, provider_id: providerId, raw: data };
+}
+
+// QR contoh (mode demo) — payload mirip EMVCo, jelas bukan transaksi nyata.
+export function demoQrString(payment) {
+  const amt = String(payment.amount);
+  const ref = String(payment.reference || payment.id).slice(0, 24);
+  return (
+    '00020101021226' +
+    '0016ID.CO.QRIS.DEMO' +
+    '52045812' +
+    '5303360' +
+    '54' + String(amt.length).padStart(2, '0') + amt +
+    '5802ID' +
+    '62' + String(('05' + String(ref.length).padStart(2, '0') + ref).length).padStart(2, '0') + '05' + String(ref.length).padStart(2, '0') + ref +
+    '6304DEMO'
+  );
+}
+
+export function qrImageUrl(qrString, size = 320) {
+  return (
+    'https://api.qrserver.com/v1/create-qr-code/?size=' +
+    size +
+    'x' +
+    size +
+    '&margin=0&data=' +
+    encodeURIComponent(qrString)
+  );
+}
+
+export function publicPayment(row) {
+  if (!row) return null;
+  const qrString = row.qr_string || '';
+  return {
+    id: row.id,
+    reference: row.reference,
+    amount: row.amount,
+    fee: row.fee,
+    net_amount: row.net_amount,
+    status: row.status,
+    description: row.description,
+    method: row.method || 'QRIS',
+    issuer: row.issuer || null,
+    qr_string: qrString || null,
+    qr_image: row.qr_image || (qrString ? qrImageUrl(qrString) : null),
+    expires_at: row.expires_at,
+    paid_at: row.paid_at,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    merchant_name: row.merchant_name || null,
+  };
+}
+
+export async function logEvent(env, paymentId, type, payload) {
+  try {
+    await env.DB.prepare(
+      'INSERT INTO events (id, payment_id, type, payload, created_at) VALUES (?, ?, ?, ?, ?)'
+    )
+      .bind(newId('evt'), paymentId, type, JSON.stringify(payload || {}), nowIso())
+      .run();
+  } catch (e) {
+    /* log tidak boleh menggagalkan transaksi */
+  }
+}
+
+export async function markPaid(env, row, info = {}) {
+  const ts = nowIso();
+  await env.DB.prepare(
+    "UPDATE payments SET status = 'paid', paid_at = ?, updated_at = ?, issuer = COALESCE(?, issuer), raw = COALESCE(?, raw) WHERE id = ?"
+  )
+    .bind(ts, ts, info.issuer || null, info.raw ? JSON.stringify(info.raw) : null, row.id)
+    .run();
+  await logEvent(env, row.id, 'paid', info);
+}
+
+
+// ===== AUTH: password, sesi, API key =====
+const PBKDF2_ITER = 100000; // batas Cloudflare Workers = 100.000 iterasi
+
+function b64(bytes) {
+  return btoa(String.fromCharCode(...new Uint8Array(bytes)));
+}
+function unb64(str) {
+  return Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
+}
+
+export async function hashPassword(password) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: PBKDF2_ITER, hash: 'SHA-256' },
+    key,
+    256
+  );
+  return `pbkdf2$${PBKDF2_ITER}$${b64(salt)}$${b64(bits)}`;
+}
+
+export async function verifyPassword(password, stored) {
+  try {
+    const parts = String(stored || '').split('$');
+    if (parts.length !== 4) return false;
+    const iter = parseInt(parts[1], 10);
+    const salt = unb64(parts[2]);
+    const want = parts[3];
+    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, key, 256);
+    return safeEqual(b64(bits), want);
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function sha256Hex(str) {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(d)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+export function randomToken(bytes = 32) {
+  const a = crypto.getRandomValues(new Uint8Array(bytes));
+  return Array.from(a).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+export function sessionCookie(token, maxAgeSec = 60 * 60 * 24 * 30) {
+  return `qris_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAgeSec}`;
+}
+
+export function clearCookie() {
+  return 'qris_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0';
+}
+
+function cookieValue(request, name) {
+  const raw = request.headers.get('cookie') || '';
+  const parts = raw.split(';');
+  for (const p of parts) {
+    const i = p.indexOf('=');
+    if (i === -1) continue;
+    if (p.slice(0, i).trim() === name) return decodeURIComponent(p.slice(i + 1).trim());
+  }
+  return '';
+}
+
+export async function createSession(env, userId) {
+  const token = randomToken(32);
+  const hash = await sha256Hex(token);
+  const now = new Date();
+  const exp = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  await env.DB.prepare('INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
+    .bind(hash, userId, now.toISOString(), exp.toISOString())
+    .run();
+  return token;
+}
+
+export async function currentUser(request, env) {
+  const token = cookieValue(request, 'qris_session');
+  if (!token) return null;
+  const hash = await sha256Hex(token);
+  const row = await env.DB.prepare(
+    'SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ? AND s.expires_at > ? LIMIT 1'
+  ).bind(hash, new Date().toISOString()).first();
+  return row || null;
+}
+
+export function publicUser(u) {
+  if (!u) return null;
+  return {
+    id: u.id,
+    email: u.email,
+    business_name: u.business_name,
+    plan: u.plan || 'warung',
+    api_key: u.api_key || null,
+    created_at: u.created_at,
+  };
+}
+
+// Pemilik transaksi: sesi login, atau Authorization: Bearer <api_key>
+export async function ownerFromRequest(request, env) {
+  const user = await currentUser(request, env);
+  if (user) return user;
+  const h = request.headers.get('authorization') || '';
+  const key = h.replace(/^Bearer\s+/i, '').trim();
+  if (key && key !== adminToken(env)) {
+    const row = await env.DB.prepare('SELECT * FROM users WHERE api_key = ? LIMIT 1').bind(key).first();
+    if (row) return row;
+  }
+  return null;
+}
+
+export async function ensurePaymentsUserId(env) {
+  // Kolom user_id ditambahkan belakangan (migrasi ringan, aman diulang)
+  try {
+    await env.DB.prepare('ALTER TABLE payments ADD COLUMN user_id TEXT').run();
+  } catch (e) {
+    /* sudah ada */
+  }
+}

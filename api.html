@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dokumentasi API — QRIS.SITE</title>
+<meta name="description" content="Dokumentasi API QRIS.SITE: buat tagihan QRIS, cek status pembayaran, dan terima webhook bertanda tangan.">
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="nav is-stuck">
+  <div class="wrap nav__inner">
+    <a class="brand" href="index.html"><span class="brand__mark">Q</span> QRIS.SITE</a>
+    <nav class="nav__links">
+      <a href="index.html#buat">Buat tagihan</a>
+      <a href="index.html#harga">Harga</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="api.html" style="color:var(--ink)">Dokumentasi</a>
+    </nav>
+    <div class="nav__cta"><a class="btn btn--sm" href="index.html#buat">Buat tagihan</a></div>
+  </div>
+</header>
+
+<main class="wrap doc">
+  <aside class="doc__nav">
+    <b>Mulai</b>
+    <a href="#ringkas">Ringkasan</a>
+    <a href="#buat">Buat tagihan</a>
+    <a href="#status">Cek status</a>
+    <a href="#webhook">Webhook</a>
+    <a href="#verifikasi">Verifikasi tanda tangan</a>
+    <a href="#admin">Endpoint admin</a>
+    <a href="#contoh">Contoh kode</a>
+  </aside>
+
+  <div>
+    <p class="eyebrow">Dokumentasi</p>
+    <h1 class="h2">API QRIS.SITE</h1>
+    <p class="lead" style="margin-top:14px">Tiga endpoint untuk menerima pembayaran QRIS: buat tagihan, cek status, dan terima notifikasi.</p>
+
+    <h2 id="ringkas">Ringkasan</h2>
+    <p>Semua permintaan memakai JSON melalui HTTPS. Base URL mengikuti domain yang sedang dipakai:</p>
+    <pre id="baseUrl">https://qris-site.pages.dev</pre>
+    <p>Respons selalu JSON. Kode status yang dipakai: <code>200</code> sukses, <code>400</code> input salah, <code>401</code> token tidak valid, <code>404</code> tidak ditemukan, <code>502</code> provider menolak.</p>
+    <div class="banner" id="modeBanner">Memuat mode pembayaran…</div>
+
+    <h2 id="buat">Buat tagihan</h2>
+    <p><code>POST /api/pay</code> membuat tagihan baru dan mengembalikan QR serta URL checkout.</p>
+
+    <table class="doc-table">
+      <thead><tr><th>Field</th><th>Tipe</th><th>Wajib</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td><code>amount</code></td><td>integer</td><td>ya</td><td>Nominal rupiah, minimal 1.000, maksimal 100.000.000.</td></tr>
+        <tr><td><code>description</code></td><td>string</td><td>tidak</td><td>Keterangan yang tampil ke pembeli (maks 200 karakter).</td></tr>
+        <tr><td><code>reference</code></td><td>string</td><td>tidak</td><td>ID pesanan milikmu. Default: id tagihan.</td></tr>
+        <tr><td><code>buyer_name</code></td><td>string</td><td>tidak</td><td>Nama pembeli untuk pencatatan.</td></tr>
+        <tr><td><code>buyer_email</code></td><td>string</td><td>tidak</td><td>Email pembeli untuk pencatatan.</td></tr>
+      </tbody>
+    </table>
+
+    <pre>curl -X POST https://qris-site.pages.dev/api/pay \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 150000,
+    "description": "Pesanan #1024",
+    "reference": "INV-1024"
+  }'</pre>
+
+    <pre>{
+  "id": "pay_m3k9a1f2b7c4",
+  "reference": "INV-1024",
+  "amount": 150000,
+  "fee": 1050,
+  "net_amount": 148950,
+  "status": "pending",
+  "mode": "demo",
+  "qr_string": "0002010102122667...",
+  "qr_image": "https://api.qrserver.com/v1/create-qr-code/?...",
+  "expires_at": "2026-11-17T14:00:00.000Z",
+  "checkout_url": "https://qris-site.pages.dev/bayar.html?id=pay_m3k9a1f2b7c4"
+}</pre>
+
+    <p>Bagikan <code>checkout_url</code> ke pembeli, atau render <code>qr_image</code> sendiri di halaman tokomu. Tagihan berlaku 15 menit.</p>
+
+    <h2 id="status">Cek status</h2>
+    <p><code>GET /api/pay/{id}</code> — bisa memakai id tagihan atau referensi. Aman dipanggil berkala (polling).</p>
+    <pre>curl https://qris-site.pages.dev/api/pay/pay_m3k9a1f2b7c4</pre>
+    <p>Nilai <code>status</code>: <code>pending</code>, <code>paid</code>, <code>expired</code>, <code>failed</code>.</p>
+    <p><code>GET /api/pay?limit=10</code> mengembalikan daftar tagihan terbaru (ringkas, tanpa data pembeli) — berguna untuk menampilkan bukti aktivitas.</p>
+
+    <h2 id="webhook">Webhook</h2>
+    <p>Provider meneruskan notifikasi ke <code>POST /api/webhook</code>. Kamu tidak perlu memanggilnya sendiri; endpoint ini yang mengubah status tagihan menjadi lunas dan mencatat jejak audit.</p>
+    <p>Format yang diterima fleksibel: id/reference dibaca dari <code>reference</code>, <code>order_id</code>, <code>merchant_ref</code>, atau <code>id</code>. Status dibaca dari <code>status</code> dengan sinonim umum (success, settlement, capture, completed, lunas).</p>
+
+    <pre>{
+  "reference": "INV-1024",
+  "status": "paid",
+  "amount": 150000,
+  "issuer": "gopay",
+  "paid_at": "2026-11-17T13:41:02Z"
+}</pre>
+
+    <h2 id="verifikasi">Verifikasi tanda tangan</h2>
+    <p>Bila <code>WEBHOOK_SECRET</code> dipasang, webhook tanpa tanda tangan valid akan ditolak (401) saat mode live. Tanda tangan = HMAC SHA-256 dari body mentah:</p>
+    <pre>// Node.js
+const crypto = require('crypto');
+const expected = crypto
+  .createHmac('sha256', process.env.WEBHOOK_SECRET)
+  .update(rawBody)
+  .digest('hex');
+
+if (req.headers['x-signature'] !== expected) {
+  return res.status(401).end();
+}</pre>
+    <p>Alternatif sederhana: kirim secret yang sama pada header <code>X-Webhook-Token</code>.</p>
+
+    <h2 id="admin">Endpoint admin</h2>
+    <p>Memakai header <code>Authorization: Bearer &lt;ADMIN_TOKEN&gt;</code>.</p>
+    <table class="doc-table">
+      <thead><tr><th>Endpoint</th><th>Fungsi</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/payments</code></td><td>Daftar transaksi + ringkasan. Query: status, q, limit, offset.</td></tr>
+        <tr><td><code>GET /api/health</code></td><td>Status layanan dan koneksi database.</td></tr>
+        <tr><td><code>POST /api/demo-pay</code></td><td>Menandai tagihan lunas untuk pengujian (mode demo, atau admin token).</td></tr>
+      </tbody>
+    </table>
+    <pre>curl https://qris-site.pages.dev/api/payments?status=paid&amp;limit=20 \
+  -H "Authorization: Bearer $ADMIN_TOKEN"</pre>
+
+    <h2 id="contoh">Contoh kode</h2>
+    <p>Membuat tagihan dari server Node, lalu menunggu status lunas:</p>
+    <pre>const base = 'https://qris-site.pages.dev';
+
+const res = await fetch(base + '/api/pay', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ amount: 150000, reference: 'INV-1024' })
+});
+const pay = await res.json();
+console.log('Kirim pembeli ke:', pay.checkout_url);
+
+// polling sederhana
+let status = 'pending';
+while (status === 'pending') {
+  await new Promise(r =&gt; setTimeout(r, 3000));
+  const s = await fetch(base + '/api/pay/' + pay.id).then(r =&gt; r.json());
+  status = s.status;
+}
+console.log('Hasil akhir:', status);</pre>
+
+    <p style="margin-top:36px"><a class="link-u" href="index.html">Kembali ke beranda</a></p>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__bottom" style="margin-top:0;border-top:0;padding-top:0">
+      <span>© 2026 QRIS.SITE</span>
+      <span><a href="legal.html">Syarat &amp; privasi</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Base URL & mode ditampilkan sesuai deployment yang sedang dibuka
+  (function () {
+    var b = document.getElementById('baseUrl');
+    if (b) b.textContent = location.origin;
+    fetch('/api/config').then(function (r) { return r.json(); }).then(function (c) {
+      var banner = document.getElementById('modeBanner');
+      if (!banner) return;
+      banner.textContent = c.mode === 'live'
+        ? 'Mode live: tagihan memakai provider QRIS sungguhan.'
+        : 'Mode percobaan: kredensial provider belum dipasang, pembayaran bisa disimulasikan dari halaman checkout.';
+    }).catch(function () {});
+  })();
+</script>
+</body>
+</html>

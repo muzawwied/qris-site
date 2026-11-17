@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QRIS.SITE — Terima pembayaran QRIS tanpa ribet</title>
+<meta name="description" content="Buat tagihan QRIS dalam hitungan detik. Pembeli scan dari e-wallet atau mobile banking apa pun, dana masuk rekening T+1. API, webhook, dan dashboard rekonsiliasi.">
+<meta name="theme-color" content="#f7f4ee">
+<meta property="og:type" content="website">
+<meta property="og:title" content="QRIS.SITE — Payment gateway QRIS">
+<meta property="og:description" content="Satu QRIS untuk semua pembayaran. Dana masuk rekening, bukan mengendap di aplikasi.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=80">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav__inner">
+    <a class="brand" href="#atas" aria-label="QRIS.SITE">
+      <span class="brand__mark">Q</span>
+      QRIS.SITE
+    </a>
+    <nav class="nav__links" id="navLinks">
+      <a href="#produk">Produk</a>
+      <a href="#buat">Buat tagihan</a>
+      <a href="#cara">Cara kerja</a>
+      <a href="#harga">Harga</a>
+      <a href="api.html">Dokumentasi</a>
+      <a href="dashboard.html">Masuk</a>
+    </nav>
+    <div class="nav__cta">
+      <a class="link-u" href="dashboard.html" style="border:0;font-size:13.5px">Masuk</a>
+      <a class="btn btn--sm" href="#buat">Buat tagihan</a>
+      <button class="nav__toggle" id="navToggle" aria-label="Buka menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="atas">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero__grid">
+    <div data-reveal>
+      <p class="eyebrow">Payment gateway QRIS · Indonesia</p>
+      <h1 class="h1">Uang masuk.<br>Bukan cuma<br><em>tercatat.</em></h1>
+      <p class="lead">
+        Buat tagihan QRIS dalam hitungan detik. Pembeli scan dari e-wallet atau
+        mobile banking apa pun, dana diteruskan ke rekening usahamu keesokan hari.
+      </p>
+      <div class="hero__actions">
+        <a class="btn" href="#buat">
+          Buat tagihan sekarang
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="link-u" href="api.html">Lihat dokumentasi API</a>
+      </div>
+      <div class="hero__note">
+        <span><i class="dot"></i> Biaya 0,7% per transaksi</span>
+        <span><i class="dot"></i> Settlement T+1</span>
+        <span><i class="dot"></i> Tanpa biaya bulanan</span>
+      </div>
+    </div>
+
+    <div data-reveal>
+      <div class="paycard">
+        <div class="paycard__head">
+          <span class="paycard__label">Tagihan · INV-2098</span>
+          <span class="status-label"><i></i> Sudah dibayar</span>
+        </div>
+        <div class="paycard__body">
+          <div class="paycard__qr">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=0&data=https%3A%2F%2Fqris.site%2Fpay%2FINV-2098" alt="Contoh QRIS" width="320" height="320">
+          </div>
+          <div>
+            <div class="paycard__amt">Rp 384.000</div>
+            <div class="paycard__sub">Kopi Susu 2× · Croissant</div>
+            <div class="paycard__rows">
+              <div class="paycard__row"><span>Metode</span><b>QRIS · GoPay</b></div>
+              <div class="paycard__row"><span>Biaya 0,7%</span><b>Rp 2.688</b></div>
+              <div class="paycard__row"><span>Masuk rekening</span><b>Rp 381.312</b></div>
+            </div>
+          </div>
+        </div>
+        <div class="paycard__float">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+          <span>Dana diteruskan<br><b>Rp 381.312</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>Kedai kopi</span><span>Toko online</span><span>Laundry</span><span>Bakery</span>
+      <span>Barbershop</span><span>Katering</span><span>Butik</span><span>Toko bangunan</span>
+      <span>Petshop</span><span>Klinik</span><span>Bengkel</span><span>Kelas online</span>
+      <span>Kedai kopi</span><span>Toko online</span><span>Laundry</span><span>Bakery</span>
+      <span>Barbershop</span><span>Katering</span><span>Butik</span><span>Toko bangunan</span>
+      <span>Petshop</span><span>Klinik</span><span>Bengkel</span><span>Kelas online</span>
+    </div>
+  </div>
+</section>
+
+<!-- INSIGHT -->
+<section class="section">
+  <div class="wrap insight">
+    <div data-reveal>
+      <p class="eyebrow">Masalah yang sering diabaikan</p>
+      <p class="insight__big">Omzet tercatat rapi,<br>tapi uangnya <em>belum tentu</em> sampai.</p>
+    </div>
+    <div class="insight__body" data-reveal>
+      <p>Banyak penjual baru sadar ada masalah ketika laporan penjualan bilang untung, sementara saldo rekening tidak bergerak. Dana tertahan di aplikasi pembayaran, biaya tidak dihitung, pencairan harus diminta manual.</p>
+      <p>QRIS.SITE menutup celah itu: tagihan dibuat dalam hitungan detik, biaya terlihat di depan, dan dana diteruskan otomatis ke rekening usahamu.</p>
+      <div class="insight__stat">
+        <div><b>0,7%</b><span>Biaya per transaksi, tanpa biaya tersembunyi</span></div>
+        <div><b>T+1</b><span>Dana masuk rekening hari kerja berikutnya</span></div>
+        <div><b>1 QRIS</b><span>Semua e-wallet &amp; mobile banking</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUAT TAGIHAN -->
+<section class="section section--tint" id="buat">
+  <div class="wrap">
+    <div class="section__head" data-reveal>
+      <p class="eyebrow">Coba langsung</p>
+      <h2 class="h2">Buat tagihan QRIS.</h2>
+      <p class="lead">Isi nominal dan keterangan, lalu bagikan QR atau link pembayarannya. Tanpa daftar, tanpa aplikasi tambahan.</p>
+    </div>
+
+    <div class="create" data-reveal>
+      <form class="create__card" id="createForm">
+        <div class="field">
+          <label for="amount">Nominal tagihan (Rp)</label>
+          <input id="amount" type="number" inputmode="numeric" min="1000" step="500" value="150000" required>
+          <div class="field__hint">Minimal Rp 1.000. Nominal pas mempermudah rekonsiliasi.</div>
+        </div>
+
+        <div class="field">
+          <label>Nominal cepat</label>
+          <div class="chips" id="quickAmounts">
+            <button type="button" class="chip" data-amount="25000">Rp 25.000</button>
+            <button type="button" class="chip" data-amount="75000">Rp 75.000</button>
+            <button type="button" class="chip is-active" data-amount="150000">Rp 150.000</button>
+            <button type="button" class="chip" data-amount="500000">Rp 500.000</button>
+            <button type="button" class="chip" data-amount="1250000">Rp 1.250.000</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Keterangan pesanan</label>
+          <input id="description" type="text" maxlength="120" placeholder="Contoh: Pesanan #1024 · Kopi Susu 2×">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="reference">Referensi (opsional)</label>
+            <input id="reference" type="text" maxlength="60" placeholder="INV-1024">
+          </div>
+          <div class="field">
+            <label for="buyerName">Nama pembeli (opsional)</label>
+            <input id="buyerName" type="text" maxlength="80" placeholder="Budi">
+          </div>
+        </div>
+
+        <div id="createMsg" class="banner" hidden></div>
+
+        <button class="btn btn--block" type="submit" id="createBtn">
+          Buat QRIS
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+
+      <aside class="create__side">
+        <h3>Yang kamu dapat</h3>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> QR dinamis dengan nominal pas</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Halaman checkout &amp; status real-time</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Webhook otomatis saat pembayaran lunas</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Riwayat lengkap di dashboard</li>
+        </ul>
+        <p class="muted" style="font-size:12.5px;margin-top:20px">Halaman ini berjalan di mode percobaan selama kredensial provider belum dipasang. Tagihan tetap tercatat dan bisa disimulasikan.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUK -->
+<section class="section" id="produk">
+  <div class="wrap">
+    <div class="section__head" data-reveal>
+      <p class="eyebrow">Yang tersedia</p>
+      <h2 class="h2">Bukan sekadar gambar QR.</h2>
+      <p class="lead">Ada pencatatan, notifikasi, rekonsiliasi, dan jalur integrasi untuk toko online.</p>
+    </div>
+
+    <div class="features" data-reveal>
+      <article class="feature">
+        <div class="feature__ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v3M17 20h4"/></svg></div>
+        <h3>QRIS dinamis</h3>
+        <p>Setiap tagihan punya QR dan nominal sendiri, jadi tidak ada lagi pembeli salah memasukkan angka.</p>
+      </article>
+      <article class="feature">
+        <div class="feature__ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg></div>
+        <h3>Notifikasi real-time</h3>
+        <p>Webhook terkirim begitu pembayaran lunas, lengkap dengan referensi pesanan dan nominal.</p>
+      </article>
+      <article class="feature">
+        <div class="feature__ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 3v6h-6"/></svg></div>
+        <h3>Settlement T+1</h3>
+        <p>Dana diteruskan ke rekening usaha otomatis, tanpa pengajuan pencairan manual setiap hari.</p>
+      </article>
+      <article class="feature">
+        <div class="feature__ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5M16 13h3M16 17h3"/></svg></div>
+        <h3>Dashboard rekonsiliasi</h3>
+        <p>Filter status, cari referensi, dan lihat total masuk per hari dalam satu halaman.</p>
+      </article>
+      <article class="feature">
+        <div class="feature__ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="16" r="4"/></svg></div>
+        <h3>API sederhana</h3>
+        <p>Tiga endpoint: buat tagihan, cek status, dan webhook. Bisa dipakai dari bahasa apa pun.</p>
+      </article>
+      <article class="feature">
+        <div class="feature__ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 4v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V7l7-4Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3>Jejak audit</h3>
+        <p>Setiap perubahan status tercatat, termasuk payload webhook mentah untuk penelusuran.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CARA KERJA -->
+<section class="section section--tint" id="cara">
+  <div class="wrap">
+    <div class="section__head" data-reveal>
+      <p class="eyebrow">Cara kerja</p>
+      <h2 class="h2">Tiga langkah, lalu selesai.</h2>
+    </div>
+    <div class="split">
+      <div class="steps" data-reveal>
+        <article class="step">
+          <span class="step__num">01</span>
+          <h3>Buat tagihan</h3>
+          <p>Isi nominal dan keterangan di halaman ini, atau panggil API dari tokomu. QR langsung jadi.</p>
+        </article>
+        <article class="step">
+          <span class="step__num">02</span>
+          <h3>Pembeli scan</h3>
+          <p>Pembeli membayar dari aplikasi apa pun yang mendukung QRIS, tanpa perlu ganti metode.</p>
+        </article>
+        <article class="step">
+          <span class="step__num">03</span>
+          <h3>Dana masuk</h3>
+          <p>Status berubah otomatis lewat webhook, dan dana diteruskan ke rekeningmu besok hari kerja.</p>
+        </article>
+      </div>
+      <figure class="frame" data-reveal>
+        <img src="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=1000&q=80" alt="Pemilik usaha menerima pembayaran" loading="lazy">
+        <figcaption class="frame__cap">Pembayaran di kasir · selesai dalam 4 detik</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- HARGA -->
+<section class="section" id="harga">
+  <div class="wrap">
+    <div class="section__head center" data-reveal>
+      <p class="eyebrow">Harga</p>
+      <h2 class="h2">Bayar dari transaksi,<br>bukan dari bulan.</h2>
+      <p class="lead">Tanpa biaya pendaftaran. Kamu hanya membayar saat ada uang masuk.</p>
+    </div>
+
+    <div class="plans" data-reveal style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+      <article class="plan" style="background:var(--white);border:1px solid var(--line);border-radius:6px;padding:30px 26px;display:flex;flex-direction:column">
+        <span class="eyebrow" style="margin-bottom:14px">Warung</span>
+        <h3 class="h3">Untuk mulai</h3>
+        <div style="font-family:var(--serif);font-size:34px;margin:14px 0 4px">0,7%</div>
+        <p class="muted" style="font-size:13px;margin:0 0 18px">per transaksi</p>
+        <ul style="list-style:none;padding:0;margin:0 0 22px;display:grid;gap:9px;font-size:13.5px;color:var(--ink-soft)">
+          <li>QRIS dinamis</li><li>Halaman checkout</li><li>Webhook dasar</li><li>Riwayat 3 bulan</li>
+        </ul>
+        <a class="btn btn--ghost btn--sm" href="#buat" style="margin-top:auto">Buat tagihan</a>
+      </article>
+
+      <article class="plan" style="background:var(--ink);color:var(--paper);border:1px solid var(--ink);border-radius:6px;padding:30px 26px;display:flex;flex-direction:column">
+        <span class="eyebrow" style="margin-bottom:14px;color:rgba(247,244,238,.55)">Toko</span>
+        <h3 class="h3" style="color:var(--paper)">Paling dipakai</h3>
+        <div style="font-family:var(--serif);font-size:34px;margin:14px 0 4px">0,5%</div>
+        <p style="font-size:13px;margin:0 0 18px;color:rgba(247,244,238,.65)">per transaksi</p>
+        <ul style="list-style:none;padding:0;margin:0 0 22px;display:grid;gap:9px;font-size:13.5px;color:rgba(247,244,238,.78)">
+          <li>Semua di Warung</li><li>API + webhook tanda tangan</li><li>Multi-user kasir</li><li>Riwayat 24 bulan</li>
+        </ul>
+        <a class="btn btn--money btn--sm" href="#buat" style="margin-top:auto">Mulai sekarang</a>
+      </article>
+
+      <article class="plan" style="background:var(--white);border:1px solid var(--line);border-radius:6px;padding:30px 26px;display:flex;flex-direction:column">
+        <span class="eyebrow" style="margin-bottom:14px">Usaha</span>
+        <h3 class="h3">Volume besar</h3>
+        <div style="font-family:var(--serif);font-size:34px;margin:14px 0 4px">Nego</div>
+        <p class="muted" style="font-size:13px;margin:0 0 18px">sesuai volume</p>
+        <ul style="list-style:none;padding:0;margin:0 0 22px;display:grid;gap:9px;font-size:13.5px;color:var(--ink-soft)">
+          <li>Semua di Toko</li><li>Settlement H+0 opsional</li><li>Rekonsiliasi multi-outlet</li><li>Pendampingan langsung</li>
+        </ul>
+        <a class="btn btn--ghost btn--sm" href="mailto:halo@qris.site" style="margin-top:auto">Hubungi kami</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section section--tint" id="tanya">
+  <div class="wrap">
+    <div class="split" style="align-items:start">
+      <div data-reveal>
+        <p class="eyebrow">Pertanyaan</p>
+        <h2 class="h2">Hal yang biasanya<br>ditanya dulu.</h2>
+        <p class="lead" style="margin-top:18px">Belum terjawab? Kirim pesan ke halo@qris.site.</p>
+      </div>
+      <div class="faq" id="faq" data-reveal>
+        <div class="faq__item"><button class="faq__q" type="button">Apakah ini QRIS resmi?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq__a"><p>Ya. Transaksi diproses melalui jalur QRIS sesuai standar Bank Indonesia lewat penyedia jasa pembayaran berizin. Pembeli memakai aplikasi apa pun yang mendukung QRIS.</p></div></div>
+        <div class="faq__item"><button class="faq__q" type="button">Berapa lama dana masuk?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq__a"><p>Standar T+1: transaksi hari ini diteruskan pada hari kerja berikutnya. Transaksi akhir pekan masuk pada hari kerja terdekat.</p></div></div>
+        <div class="faq__item"><button class="faq__q" type="button">Bisa integrasi ke toko online?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq__a"><p>Bisa. Ada endpoint buat tagihan, cek status, dan webhook dengan tanda tangan HMAC. Contoh kode tersedia di halaman dokumentasi.</p></div></div>
+        <div class="faq__item"><button class="faq__q" type="button">Bagaimana kalau pembayaran gagal?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq__a"><p>Status tercatat sebagai failed atau expired, tidak ada dana yang terpotong. Pembeli bisa membayar ulang dengan tagihan yang sama selama belum kedaluwarsa.</p></div></div>
+        <div class="faq__item"><button class="faq__q" type="button">Apakah ada biaya bulanan?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button><div class="faq__a"><p>Tidak ada. Biaya hanya dipotong per transaksi dan selalu terlihat sebelum dana diteruskan.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="cta" data-reveal>
+      <div>
+        <p class="eyebrow">Mulai sekarang</p>
+        <h2 class="h2">Tagihan QRIS pertama<br>dalam 30 detik.</h2>
+        <p class="lead" style="margin-top:16px">Tanpa daftar untuk mencoba. Kredensial provider tinggal dipasang saat siap menerima pembayaran sungguhan.</p>
+      </div>
+      <div class="cta__actions">
+        <a class="btn" href="#buat">Buat tagihan</a>
+        <a class="btn btn--ghost" href="api.html">Baca dokumentasi</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div class="foot__brand">
+        <a class="brand" href="#atas"><span class="brand__mark">Q</span> QRIS.SITE</a>
+        <p>Payment gateway QRIS untuk penjual Indonesia. Tagihan cepat, dana masuk rekening.</p>
+      </div>
+      <div><h4>Produk</h4><ul><li><a href="#produk">Fitur</a></li><li><a href="#buat">Buat tagihan</a></li><li><a href="#harga">Harga</a></li><li><a href="dashboard.html">Masuk</a></li></ul></div>
+      <div><h4>Developer</h4><ul><li><a href="api.html">Dokumentasi API</a></li><li><a href="api.html#webhook">Webhook</a></li><li><a href="/api/health">Status sistem</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="legal.html">Syarat &amp; ketentuan</a></li><li><a href="legal.html#privasi">Kebijakan privasi</a></li><li><a href="legal.html#biaya">Biaya &amp; limit</a></li></ul></div>
+    </div>
+    <div class="foot__bottom">
+      <span>© 2026 QRIS.SITE</span>
+      <span>QRIS diproses melalui penyedia jasa pembayaran berizin Bank Indonesia.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src="js/main.js"></script>
+</body>
+</html>

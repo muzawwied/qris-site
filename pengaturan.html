@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pengaturan — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <div class="topbar"><div><h1>Pengaturan</h1><p>Data usaha, keamanan akun, dan sesi.</p></div></div>
+
+    <div class="grid-2" style="align-items:start">
+      <div class="panel">
+        <div class="panel__head"><div><h2>Profil usaha</h2><p>Nama ini dipakai di riwayat dan notifikasi.</p></div></div>
+        <form id="profileForm">
+          <div class="field"><label for="business">Nama usaha</label><input id="business" type="text" maxlength="80" required></div>
+          <div class="field"><label for="email">Email</label><input id="email" type="email" disabled></div>
+          <div id="profileMsg" class="banner" hidden></div>
+          <button class="btn btn--sm" type="submit">Simpan perubahan</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><div><h2>Ganti password</h2><p>Minimal 8 karakter. Sesi lain tetap aktif.</p></div></div>
+        <form id="passForm">
+          <div class="field"><label for="cur">Password saat ini</label><input id="cur" type="password" autocomplete="current-password" required></div>
+          <div class="field"><label for="next">Password baru</label><input id="next" type="password" minlength="8" autocomplete="new-password" required></div>
+          <div id="passMsg" class="banner" hidden></div>
+          <button class="btn btn--sm" type="submit">Perbarui password</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:18px">
+      <div class="panel__head"><div><h2>Sesi</h2><p>Keluar dari perangkat ini.</p></div></div>
+      <button class="btn btn--ghost btn--sm" id="logout">Keluar dari akun</button>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="js/app-shell.js"></script>
+<script src="js/page-pengaturan.js"></script>
+</body>
+</html>

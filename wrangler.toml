@@ -1,0 +1,8 @@
+name = "qris-site"
+pages_build_output_dir = "."
+compatibility_date = "2026-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "qris-db"
+database_id = "cf93b876-1773-465a-9f92-2c4f046dd3c5"

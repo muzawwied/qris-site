@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QRIS — QRIS.SITE</title>
+<meta name="description" content="Tampilan QRIS untuk dibayar. Scan dengan aplikasi e-wallet atau mobile banking apa pun.">
+<meta name="theme-color" content="#f7f4ee">
+<meta property="og:title" content="Pembayaran QRIS">
+<meta property="og:description" content="Scan QRIS untuk menyelesaikan pembayaran.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { background: var(--paper); }
+  .qrpage { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 18px 40px; }
+  .qrpage__brand { display: inline-flex; align-items: center; gap: 9px; font-family: var(--serif); font-size: 17px; margin-bottom: 22px; opacity: .9; }
+  .qrpage__card {
+    width: min(100%, 430px);
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 30px 26px 26px;
+    text-align: center;
+    box-shadow: 0 30px 70px -50px rgba(23, 22, 15, .55);
+  }
+  .qrpage__status { display: inline-flex; align-items: center; gap: 7px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; color: var(--money); margin-bottom: 18px; }
+  .qrpage__status i { width: 6px; height: 6px; border-radius: 50%; background: var(--money-bright); animation: pulse 2.2s infinite; }
+  .qrpage__merchant { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .qrpage__qr { width: min(100%, 300px); aspect-ratio: 1; margin: 0 auto 20px; border: 1px solid var(--line); border-radius: 6px; padding: 12px; background: #fff; }
+  .qrpage__qr img { width: 100%; height: 100%; object-fit: contain; }
+  .qrpage__amt { font-family: var(--serif); font-size: clamp(30px, 8vw, 40px); letter-spacing: -.02em; line-height: 1.1; }
+  .qrpage__desc { font-size: 13.5px; color: var(--muted); margin-top: 6px; }
+  .qrpage__timer { font-size: 12.5px; color: var(--muted); margin-top: 14px; letter-spacing: .02em; }
+  .qrpage__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 22px; }
+  .qrpage__links { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: center; font-size: 12.5px; }
+  .qrpage__foot { margin-top: 26px; font-size: 11.5px; color: var(--muted); text-align: center; max-width: 380px; line-height: 1.6; }
+  .qrpage__paid { margin-top: 6px; }
+  @media print {
+    .qrpage__actions, .qrpage__links, .qrpage__brand, .qrpage__foot { display: none !important; }
+    .qrpage { min-height: auto; padding: 0; }
+    .qrpage__card { box-shadow: none; border: 0; width: 100%; }
+    body { background: #fff; }
+  }
+</style>
+</head>
+<body>
+<main class="qrpage">
+  <a class="qrpage__brand" href="index.html"><span class="brand__mark" style="width:24px;height:24px;font-size:11px">Q</span> QRIS.SITE</a>
+
+  <section class="qrpage__card" id="card" hidden>
+    <div class="qrpage__status" id="status"><i></i> Menunggu pembayaran</div>
+    <div class="qrpage__merchant" id="merchant">QRIS</div>
+    <div class="qrpage__qr"><img id="qrImg" alt="Kode QRIS pembayaran" width="300" height="300"></div>
+    <div class="qrpage__amt" id="amount">Rp 0</div>
+    <div class="qrpage__desc" id="desc"></div>
+    <div class="qrpage__timer" id="timer"></div>
+
+    <div class="qrpage__paid" id="paidNote" hidden>
+      <div class="banner" style="margin:16px 0 0;text-align:left">Pembayaran sudah diterima. Terima kasih.</div>
+    </div>
+
+    <div class="qrpage__actions">
+      <button class="btn btn--sm" id="shareBtn" type="button">Bagikan</button>
+      <button class="btn btn--ghost btn--sm" id="downloadBtn" type="button">Unduh QR</button>
+    </div>
+    <div class="qrpage__links">
+      <a class="link-u" id="checkoutLink" href="#" style="font-size:12.5px">Halaman pembayaran</a>
+      <a class="link-u" href="index.html" style="font-size:12.5px">Buat tagihan</a>
+    </div>
+  </section>
+
+  <div class="qrpage__card" id="errorCard" hidden>
+    <p class="eyebrow" style="margin-bottom:8px">QRIS</p>
+    <h1 class="h3" style="margin-bottom:10px">Tagihan tidak ditemukan</h1>
+    <p class="muted" style="font-size:13.5px">Periksa kembali tautan yang dibagikan, atau buat tagihan baru.</p>
+    <a class="btn btn--sm" href="index.html#buat" style="margin-top:18px">Buat tagihan</a>
+  </div>
+
+  <p class="qrpage__foot">Scan dengan aplikasi e-wallet atau mobile banking apa pun yang mendukung QRIS. Nominal sudah terisi otomatis.</p>
+</main>
+<div class="toast" id="toast"></div>
+<script src="js/page-qris.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pembayaran QRIS — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="nav is-stuck">
+  <div class="wrap nav__inner">
+    <a class="brand" href="index.html"><span class="brand__mark">Q</span> QRIS.SITE</a>
+    <nav class="nav__links">
+      <a href="index.html#buat">Buat tagihan</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="api.html">Dokumentasi</a>
+    </nav>
+    <div class="nav__cta">
+      <a class="btn btn--sm" href="index.html#buat">Buat tagihan</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap checkout">
+  <div id="loading" class="banner">Memuat tagihan…</div>
+
+  <div id="content" hidden>
+    <div class="checkout__grid">
+      <div class="checkout__qr">
+        <div class="status-label" id="statusLabel" style="margin-bottom:16px"><i></i> Menunggu pembayaran</div>
+        <img id="qrImg" alt="QRIS pembayaran" width="240" height="240">
+        <div class="checkout__amt" id="amount">Rp 0</div>
+        <div class="muted" style="font-size:12.5px;margin-top:6px" id="countdown">Berlaku 15 menit</div>
+        <div id="qrFallback" hidden style="margin-top:16px">
+          <p class="muted" style="font-size:12.5px">QR tidak dapat dimuat otomatis. Buka gambar QRIS di tab baru:</p>
+          <a class="btn btn--ghost btn--sm" id="qrLink" href="#" target="_blank" rel="noopener">Buka QRIS</a>
+        </div>
+      </div>
+
+      <div class="checkout__detail">
+        <h2 id="title">Pembayaran QRIS</h2>
+        <p class="muted" style="margin:0;font-size:13.5px" id="subtitle">Scan QR dengan aplikasi e-wallet atau mobile banking apa pun.</p>
+
+        <div class="kv">
+          <div class="kv__row"><span>Nomor tagihan</span><b class="mono" id="payId">—</b></div>
+          <div class="kv__row"><span>Referensi</span><b class="mono" id="payRef">—</b></div>
+          <div class="kv__row"><span>Nominal</span><b id="payAmount">—</b></div>
+          <div class="kv__row"><span>Biaya layanan 0,7%</span><b id="payFee">—</b></div>
+          <div class="kv__row"><span>Masuk ke penjual</span><b id="payNet" class="money" style="color:var(--money)">—</b></div>
+          <div class="kv__row"><span>Metode</span><b>QRIS</b></div>
+          <div class="kv__row"><span>Kedaluwarsa</span><b id="payExp">—</b></div>
+        </div>
+
+        <div class="checkout__steps">
+          <p><b>1.</b> Buka aplikasi e-wallet atau mobile banking pilihanmu.</p>
+          <p><b>2.</b> Pilih menu Scan QRIS, arahkan ke kode di samping.</p>
+          <p><b>3.</b> Periksa nominal, lalu konfirmasi pembayaran.</p>
+        </div>
+
+        <div id="demoArea" hidden style="margin-top:22px">
+          <div class="banner banner--warn">Mode percobaan: kredensial provider QRIS belum dipasang, jadi pembayaran bisa disimulasikan untuk menguji alur.</div>
+          <button class="btn btn--money btn--block" id="simulateBtn" type="button">Simulasikan pembayaran berhasil</button>
+        </div>
+
+        <div id="paidBox" hidden style="margin-top:22px">
+          <div class="banner" style="border-color:var(--money)">Pembayaran diterima. Terima kasih sudah membayar tepat waktu.</div>
+        </div>
+
+        <div class="qrpage__actions" style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:22px">
+          <a class="btn btn--ghost btn--sm" id="bigQrLink" href="#" target="_blank" rel="noopener">QR besar</a>
+          <button class="btn btn--ghost btn--sm" id="sharePay" type="button">Bagikan</button>
+        </div>
+        <p style="margin-top:20px"><a class="link-u" href="index.html#buat">Buat tagihan lain</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="errorBox" hidden class="banner banner--err"></div>
+</main>
+
+<div class="toast" id="toast"></div>
+<script src="js/bayar.js"></script>
+</body>
+</html>
