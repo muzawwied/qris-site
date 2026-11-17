@@ -7,7 +7,7 @@
 
   function showLink(slug) {
     if (!slug) return;
-    shopUrl = location.origin + '/toko/' + slug;
+    shopUrl = location.origin + '/' + slug;
     $('#shopLink').textContent = shopUrl.replace('https://', '');
     $('#openShop').href = shopUrl;
     $('#slugPreview').textContent = slug;

@@ -53,50 +53,63 @@
   .onb__slug { display: flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 3px; overflow: hidden; background: #fff; }
   .onb__slug span { padding: 0 10px; font-size: 12px; color: var(--muted); background: #f3efe8; align-self: stretch; display: flex; align-items: center; border-right: 1px solid var(--line); }
   .onb__slug input { border: 0; flex: 1; padding: 11px 12px; font: inherit; font-size: 14px; background: transparent; outline: none; }
+  .onb__mini { margin: 12px 0 0; text-align: center; }
+  .onb__back { background: none; border: 0; padding: 4px; font: inherit; font-size: 12px; color: var(--muted); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .onb__back:hover { color: var(--ink); }
   @media (max-width: 520px) { .onb__bar { padding: 18px 20px; } }
 </style>
 </head>
 <body class="onb-body">
 <header class="onb__bar">
   <a class="onb__brand" href="/"><img src="/assets/brand/icon-48.png" alt=""> <span>Clinqoo</span></a>
-  <span class="onb__note">Langkah 2 dari 2</span>
+  <span class="onb__note">Profil usaha</span>
 </header>
 
 <main class="onb__main">
   <form class="onb__card" id="onbForm" novalidate>
-    <p class="onb__step">Profil usaha</p>
-    <h1>Isi identitas tokomu.</h1>
-    <p class="lead">Nama ini yang muncul di halaman pembayaran pembeli. Bisa diubah kapan saja di Pengaturan.</p>
 
-    <div class="onb__logo">
-      <div class="onb__avatar" id="avatar">F</div>
-      <div>
-        <button class="btn btn--ghost btn--sm" type="button" id="pickPhoto">Pilih foto</button>
-        <small>JPG atau PNG, maksimal sekitar 150 KB.</small>
+    <section class="onb__step-pane" data-pane="name">
+      <h1>Nama tokomu.</h1>
+      <p class="lead">Nama ini yang tampil di halaman pembayaran pembeli.</p>
+      <div class="field">
+        <label for="bizName">Nama toko</label>
+        <input id="bizName" type="text" maxlength="80" placeholder="Kedai Kopi Senja" autocomplete="organization">
       </div>
-      <input type="file" id="photo" accept="image/png,image/jpeg" hidden>
-    </div>
+      <div id="msg1" class="banner banner--err" hidden></div>
+      <button class="btn btn--block" type="button" id="nextName">Lanjut</button>
+    </section>
 
-    <div class="field">
-      <label for="bizName">Nama toko</label>
-      <input id="bizName" type="text" maxlength="80" placeholder="Kedai Kopi Senja" autocomplete="organization" required>
-    </div>
-
-    <div class="field">
-      <label for="slug">Link toko</label>
-      <div class="onb__slug">
-        <span>qris-site.pages.dev/toko/</span>
-        <input id="slug" type="text" maxlength="30" placeholder="kedai-senja" autocomplete="off">
+    <section class="onb__step-pane" data-pane="slug" hidden>
+      <h1>Link toko.</h1>
+      <p class="lead">Alamat pendek untuk membuka halaman tokomu.</p>
+      <div class="field">
+        <label for="slug">Link</label>
+        <div class="onb__slug">
+          <span id="hostLabel">/</span>
+          <input id="slug" type="text" maxlength="30" placeholder="kedai-senja" autocomplete="off">
+        </div>
       </div>
-    </div>
+      <div id="msg2" class="banner banner--err" hidden></div>
+      <button class="btn btn--block" type="button" id="nextSlug">Lanjut</button>
+      <p class="onb__mini"><button type="button" class="onb__back" id="backName">Kembali</button></p>
+    </section>
 
-    <div id="msg" class="banner banner--err" hidden></div>
+    <section class="onb__step-pane" data-pane="photo" hidden>
+      <h1>Foto profil.</h1>
+      <p class="lead">Opsional. Dipakai di sidebar dan halaman toko.</p>
+      <div class="onb__logo">
+        <div class="onb__avatar" id="avatar">F</div>
+        <div>
+          <button class="btn btn--ghost btn--sm" type="button" id="pickPhoto">Pilih foto</button>
+          <small>JPG atau PNG, maksimal sekitar 150 KB.</small>
+        </div>
+        <input type="file" id="photo" accept="image/png,image/jpeg" hidden>
+      </div>
+      <div id="msg3" class="banner banner--err" hidden></div>
+      <button class="btn btn--block" type="button" id="save">Simpan</button>
+      <p class="onb__mini"><button type="button" class="onb__back" id="skipPhoto">Lewati foto</button></p>
+    </section>
 
-    <button class="btn btn--block" type="submit" id="save">Simpan dan buka dashboard</button>
-
-    <div class="onb__foot">
-      Data ini hanya untuk tampilan tagihan. Tidak ada unggah dokumen atau verifikasi tambahan.
-    </div>
   </form>
 </main>
 
@@ -104,11 +117,11 @@
 (function () {
   var $ = function (s) { return document.querySelector(s); };
   var logo = '';
-  var msg = $('#msg');
-  var save = $('#save');
   var biz = $('#bizName');
   var slug = $('#slug');
-  var avatar = $('#avatar');
+
+  $('#hostLabel').textContent = location.host + '/';
+  $('#avatar').textContent = 'F';
 
   fetch('/api/auth/me', { credentials: 'same-origin' })
     .then(function (r) { return r.json(); })
@@ -117,22 +130,53 @@
       if (!u) { location.replace('/masuk/'); return; }
       if (u.onboarded) { location.replace('/app/'); return; }
       if (u.business_name) biz.value = u.business_name;
-      if (u.store_slug) slug.value = u.store_slug;
-      if (u.logo) { logo = u.logo; avatar.innerHTML = '<img alt="" src="' + u.logo + '">'; }
+      if (u.store_slug) { slug.value = u.store_slug; slug.dataset.touched = '1'; }
+      if (u.logo) { logo = u.logo; $('#avatar').innerHTML = '<img alt="" src="' + u.logo + '">'; }
     })
     .catch(function () { location.replace('/masuk/'); });
 
-  avatar.textContent = 'F';
+  function show(name) {
+    var panes = document.querySelectorAll('.onb__step-pane');
+    for (var i = 0; i < panes.length; i++) {
+      panes[i].hidden = panes[i].getAttribute('data-pane') !== name;
+    }
+  }
 
   biz.addEventListener('input', function () {
-    avatar = $('#avatar');
     if (!logo) $('#avatar').textContent = (biz.value.trim().charAt(0) || 'F').toUpperCase();
-    if (!$('#slug').dataset.touched) {
-      $('#slug').value = biz.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
+    if (!slug.dataset.touched) {
+      slug.value = biz.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
     }
   });
   slug.addEventListener('input', function () { slug.dataset.touched = '1'; });
 
+  $('#nextName').addEventListener('click', function () {
+    var m = $('#msg1');
+    m.hidden = true;
+    if (!biz.value.trim()) {
+      m.hidden = false;
+      m.textContent = 'Nama toko wajib diisi.';
+      biz.focus();
+      return;
+    }
+    show('slug');
+    slug.focus();
+  });
+
+  $('#nextSlug').addEventListener('click', function () {
+    var m = $('#msg2');
+    m.hidden = true;
+    var v = slug.value.trim();
+    if (v && v.replace(/[^a-z0-9-]/g, '').length < 3) {
+      m.hidden = false;
+      m.textContent = 'Link minimal 3 karakter.';
+      slug.focus();
+      return;
+    }
+    show('photo');
+  });
+
+  $('#backName').addEventListener('click', function () { show('name'); });
   $('#pickPhoto').addEventListener('click', function () { $('#photo').click(); });
   $('#photo').addEventListener('change', function () {
     var f = this.files && this.files[0];
@@ -155,23 +199,17 @@
     reader.readAsDataURL(f);
   });
 
-  $('#onbForm').addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    msg.hidden = true;
-    var name = biz.value.trim();
-    if (!name) {
-      msg.hidden = false;
-      msg.textContent = 'Nama toko wajib diisi.';
-      biz.focus();
-      return;
-    }
-    var payload = { business_name: name, onboarded: true };
-    var s = slug.value.trim();
-    if (s) payload.store_slug = s;
-    if (logo) payload.logo = logo;
+  function submit(withPhoto) {
+    var m = $('#msg3');
+    var btn = $('#save');
+    m.hidden = true;
+    var payload = { business_name: biz.value.trim(), onboarded: true };
+    var sl = slug.value.trim();
+    if (sl) payload.store_slug = sl;
+    if (withPhoto && logo) payload.logo = logo;
 
-    save.disabled = true;
-    save.textContent = 'Menyimpan…';
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan…';
     fetch('/api/me/profile', {
       method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
@@ -183,12 +221,15 @@
         location.replace('/app/');
       })
       .catch(function (err) {
-        msg.hidden = false;
-        msg.textContent = err.message;
-        save.disabled = false;
-        save.textContent = 'Simpan dan buka dashboard';
+        m.hidden = false;
+        m.textContent = err.message;
+        btn.disabled = false;
+        btn.textContent = 'Simpan';
       });
-  });
+  }
+
+  $('#save').addEventListener('click', function () { submit(true); });
+  $('#skipPhoto').addEventListener('click', function () { submit(false); });
 })();
 </script>
 </body>

@@ -8,6 +8,6 @@
     var toko = document.getElementById('rowToko');
     if (profil) profil.textContent = u.business_name || u.email || '—';
     if (sesi) sesi.textContent = u.email || '—';
-    if (toko) toko.textContent = u.store_slug ? '/toko/' + u.store_slug : '—';
+    if (toko) toko.textContent = u.store_slug ? '/' + u.store_slug : '—';
   });
 })();
