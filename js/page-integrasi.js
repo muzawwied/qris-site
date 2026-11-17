@@ -28,7 +28,6 @@
   fetch('/api/health').then(function (r) { return r.json(); }).then(function (h) {
     $('#hApi').textContent = h.ok ? 'Normal' : 'Gangguan';
     $('#hDb').textContent = h.db === 'ok' ? 'Terhubung' : 'Error';
-    $('#hMode').textContent = h.mode === 'live' ? 'Live' : 'Percobaan';
   }).catch(function () { $('#hApi').textContent = 'Tidak terjangkau'; });
 
   document.addEventListener('session', function (ev) { if (ev.detail.user) loadKey(); else location.href = '/app/'; });

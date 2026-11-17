@@ -88,9 +88,6 @@
         $('#sFee').textContent = fmt(s.fee_paid);
         $('#sPending').textContent = (s.pending_count || 0) + ' tagihan';
 
-        var ml = $('#modeLabel');
-        ml.className = 'status-label' + (d.mode === 'live' ? '' : ' status-label--wait');
-        ml.innerHTML = '<i></i> ' + (d.mode === 'live' ? 'mode live' : 'mode percobaan');
 
         var list = d.payments || [];
         $('#recentRows').innerHTML = list.map(function (p) {
@@ -102,8 +99,6 @@
         }).join('');
         $('#recentEmpty').hidden = list.length > 0;
 
-        var hMode = $('#hMode');
-        if (hMode) hMode.textContent = d.mode === 'live' ? 'Live' : 'Percobaan';
       })
       .catch(function (err) {
         if (err.message === 'unauthorized') { gate.hidden = false; content.hidden = true; return; }

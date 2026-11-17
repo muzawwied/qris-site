@@ -48,7 +48,6 @@
     <p>Semua permintaan memakai JSON melalui HTTPS. Base URL mengikuti domain yang sedang dipakai:</p>
     <pre id="baseUrl">https://qris-site.pages.dev</pre>
     <p>Respons selalu JSON. Kode status yang dipakai: <code>200</code> sukses, <code>400</code> input salah, <code>401</code> token tidak valid, <code>404</code> tidak ditemukan, <code>502</code> provider menolak.</p>
-    <div class="banner" id="modeBanner">Memuat mode pembayaran…</div>
 
     <h2 id="buat">Buat tagihan</h2>
     <p><code>POST /api/pay</code> membuat tagihan baru dan mengembalikan QR serta URL checkout.</p>
@@ -175,13 +174,7 @@ console.log('Hasil akhir:', status);</pre>
   (function () {
     var b = document.getElementById('baseUrl');
     if (b) b.textContent = location.origin;
-    fetch('/api/config').then(function (r) { return r.json(); }).then(function (c) {
-      var banner = document.getElementById('modeBanner');
-      if (!banner) return;
-      banner.textContent = c.mode === 'live'
-        ? 'Mode live: tagihan memakai provider QRIS sungguhan.'
-        : 'Mode percobaan: kredensial provider belum dipasang, pembayaran bisa disimulasikan dari halaman checkout.';
-    }).catch(function () {});
+
   })();
 </script>
 </body>
