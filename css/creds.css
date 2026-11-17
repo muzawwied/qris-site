@@ -1,0 +1,41 @@
+/* Kredensial integrasi: ikon mata menyatu di dalam field, tanpa border/latar */
+.keybox.keybox--withicon { position: relative; padding-right: 46px; }
+
+.keybox--withicon button.keybox__eye,
+.keybox--withicon .keybox__eye {
+  position: absolute;
+  right: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  margin: 0;
+  border: 0 !important;
+  border-width: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+  color: #8a8578;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.keybox--withicon .keybox__eye:hover,
+.keybox--withicon .keybox__eye:focus,
+.keybox--withicon .keybox__eye:focus-visible,
+.keybox--withicon .keybox__eye:active {
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #17160f;
+}
+
+.keybox--withicon .keybox__eye svg { display: block; }
