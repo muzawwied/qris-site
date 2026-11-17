@@ -45,6 +45,12 @@ export async function onRequestPost({ request, env }) {
     '';
   const tokenHeader = request.headers.get('x-webhook-token') || '';
 
+  // Mode live tanpa secret = webhook palsu bisa mengubah status pembayaran.
+  if (!secret && mode(env) === 'live') {
+    await logEvent(env, null, 'webhook_rejected', { reason: 'secret_missing' });
+    return json({ error: 'WEBHOOK_SECRET belum dipasang di server.' }, 503);
+  }
+
   let verified = false;
   let verifiedBy = null;
 

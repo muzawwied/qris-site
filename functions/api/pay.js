@@ -20,7 +20,8 @@ export async function onRequestPost({ request, env }) {
   try {
     owner = await ownerFromRequest(request, env);
   } catch (e) {
-    if (e && e.status === 401 && (request.headers.get('authorization') || '')) {
+    const usedKey = (request.headers.get('authorization') || '') || (request.headers.get('x-api-key') || '');
+    if (e && e.status === 401 && usedKey) {
       return json({ error: e.message }, 401);
     }
     owner = null;

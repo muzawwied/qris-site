@@ -414,7 +414,8 @@ export async function ownerFromRequest(request, env) {
   if (user) return user;
 
   const h = request.headers.get('authorization') || '';
-  const key = h.replace(/^Bearer\s+/i, '').trim();
+  const keyHeader = request.headers.get('x-api-key') || '';
+  const key = (h ? h.replace(/^Bearer\s+/i, '').trim() : '') || keyHeader.trim();
   if (!key) return null;
   if (key === adminToken(env)) return null;
 
