@@ -1,5 +1,5 @@
 import {
-  ensureSchema, ensureUsersStoreSlug, slugify, json, cors, readJson, currentUser, publicUser,
+  ensureSchema, ensureUsersStoreSlug, ensureUsersVerified, slugify, json, cors, readJson, currentUser, publicUser,
 } from '../_lib.js';
 
 export async function onRequestOptions() { return cors(); }
@@ -8,6 +8,7 @@ export async function onRequestOptions() { return cors(); }
 export async function onRequestPost({ request, env }) {
   await ensureSchema(env);
   await ensureUsersStoreSlug(env);
+  await ensureUsersVerified(env);
   const user = await currentUser(request, env);
   if (!user) return json({ error: 'Silakan masuk dulu.' }, 401);
 
@@ -44,6 +45,8 @@ export async function onRequestPost({ request, env }) {
       patch.logo = raw;
     }
   }
+
+  if (body && body.onboarded) patch.onboarded = 1;
 
   if (!Object.keys(patch).length) return json({ error: 'Tidak ada yang diubah.' }, 400);
 

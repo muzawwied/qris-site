@@ -110,6 +110,10 @@
     .then(function (r) { return r.json(); })
     .then(function (d) {
       var user = d && d.user;
+      if (user && user.onboarded === 0) {
+        location.replace('/onboarding/');
+        return;
+      }
       render(user);
       document.dispatchEvent(new CustomEvent('session', { detail: { user: user } }));
     })

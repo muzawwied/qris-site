@@ -73,9 +73,19 @@ CREATE TABLE IF NOT EXISTS password_resets (
   used_at TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);
+CREATE TABLE IF NOT EXISTS email_verifications (
+  token_hash TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  email TEXT,
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  used_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_email_verifications_user ON email_verifications(user_id);
 `;
 
 let schemaReady = false;
+let verifiedEnsured = false;
 
 export async function ensureSchema(env) {
   if (schemaReady) return;
@@ -410,6 +420,8 @@ export function publicUser(u) {
     store_slug: u.store_slug || null,
     logo: u.logo || null,
     api_key: u.api_key || null,
+    email_verified: u.email_verified ? 1 : 0,
+    onboarded: u.onboarded ? 1 : 0,
     created_at: u.created_at,
   };
 }
@@ -530,6 +542,24 @@ export function slugify(input) {
 let slugEnsured = false;
 
 // Link toko: satu alamat tetap per akun, dipakai pembeli untuk bayar nominal bebas.
+export async function ensureUsersVerified(env) {
+  if (verifiedEnsured) return;
+  try {
+    await env.DB.prepare('ALTER TABLE users ADD COLUMN email_verified INTEGER DEFAULT 0').run();
+  } catch (e) { /* sudah ada */ }
+  try {
+    await env.DB.prepare('ALTER TABLE users ADD COLUMN onboarded INTEGER DEFAULT 0').run();
+  } catch (e) { /* sudah ada */ }
+  // Akun yang dibuat sebelum alur verifikasi ini berlaku tidak perlu melewatinya lagi.
+  // Hanya baris lama yang disentuh supaya pendaftar baru tetap 0.
+  const CUTOFF = '2026-11-17T15:15:00Z';
+  try {
+    await env.DB.prepare("UPDATE users SET email_verified = 1 WHERE (email_verified IS NULL OR email_verified = 0) AND created_at < ?").bind(CUTOFF).run();
+    await env.DB.prepare("UPDATE users SET onboarded = 1 WHERE (onboarded IS NULL OR onboarded = 0) AND created_at < ?").bind(CUTOFF).run();
+  } catch (e) { /* abaikan */ }
+  verifiedEnsured = true;
+}
+
 export async function ensureUsersStoreSlug(env) {
   if (slugEnsured) return;
   try {
@@ -559,4 +589,31 @@ export async function ensureUsersStoreSlug(env) {
     await env.DB.prepare('UPDATE users SET store_slug = ? WHERE id = ?').bind(candidate, r.id).run();
   }
   slugEnsured = true;
+}
+
+
+// ===== Verifikasi email =====
+export async function sendVerifyEmail(env, { to, link }) {
+  const key = String(env.RESEND_API_KEY || '');
+  if (!key) return false;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: env.MAIL_FROM || 'Clinqoo <no-reply@clinqoo.id>',
+        to: [to],
+        subject: 'Aktifkan akun Clinqoo kamu',
+        html: `<div style="font-family:system-ui,sans-serif;line-height:1.6;color:#17160f">
+          <p>Halo,</p>
+          <p>Klik tautan berikut untuk mengaktifkan akun Clinqoo kamu. Tautan berlaku 24 jam.</p>
+          <p><a href="${link}" style="background:#17160f;color:#f7f4ee;padding:12px 20px;border-radius:3px;text-decoration:none;display:inline-block">Aktifkan akun</a></p>
+          <p style="color:#6b675c;font-size:13px">Kalau kamu tidak membuat akun, abaikan saja email ini.</p>
+        </div>`,
+      }),
+    });
+    return r.ok;
+  } catch (e) {
+    return false;
+  }
 }

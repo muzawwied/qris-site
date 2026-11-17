@@ -1,4 +1,4 @@
-import { ensureSchema, ensurePaymentsUserId, json, cors, readJson, verifyPassword, createSession, sessionCookie, publicUser } from '../_lib.js';
+import { ensureSchema, ensurePaymentsUserId, ensureUsersVerified, json, cors, readJson, verifyPassword, createSession, sessionCookie, publicUser } from '../_lib.js';
 
 export async function onRequestOptions() { return cors(); }
 
@@ -6,6 +6,7 @@ export async function onRequestOptions() { return cors(); }
 export async function onRequestPost({ request, env }) {
   await ensureSchema(env);
   await ensurePaymentsUserId(env);
+  await ensureUsersVerified(env);
 
   const body = await readJson(request);
   if (!body) return json({ error: 'Body harus JSON.' }, 400);
@@ -20,6 +21,17 @@ export async function onRequestPost({ request, env }) {
   const ok = await verifyPassword(password, user.password_hash);
   if (!ok) return json({ error: 'Email atau password salah.' }, 401);
 
+  if (!user.email_verified) {
+    return json(
+      { error: 'Akun belum aktif. Cek email kamu untuk mengaktifkannya.', needs_verification: true, email: user.email },
+      403
+    );
+  }
+
   const token = await createSession(env, user.id);
-  return json({ ok: true, user: publicUser(user) }, 200, { 'Set-Cookie': sessionCookie(token) });
+  return json(
+    { ok: true, user: publicUser(user), redirect: user.onboarded ? '/app/' : '/onboarding/' },
+    200,
+    { 'Set-Cookie': sessionCookie(token) }
+  );
 }

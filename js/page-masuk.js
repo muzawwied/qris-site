@@ -13,13 +13,12 @@
     tab = t;
     $('#tabLogin').classList.toggle('is-on', t === 'login');
     $('#tabRegister').classList.toggle('is-on', t === 'register');
-    $('#bizField').hidden = t !== 'register';
     $('#pwHint').hidden = t !== 'register';
     $('#forgotRow').hidden = t !== 'login';
     $('#authBtn').textContent = t === 'register' ? 'Buat akun' : 'Masuk';
     $('#authHeadline').textContent = t === 'register' ? 'Buat akun usahamu.' : 'Masuk ke akunmu.';
     $('#authSub').textContent = t === 'register'
-      ? 'Cukup nama usaha, email, dan password. Tanpa unggah dokumen.'
+      ? 'Cukup email dan password. Nama usaha diisi setelah email aktif.'
       : 'Kelola tagihan, transaksi, dan pencairan di satu tempat.';
     $('#password').setAttribute('autocomplete', t === 'register' ? 'new-password' : 'current-password');
     $('#authMsg').hidden = true;
@@ -42,7 +41,6 @@
   $('#authForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var payload = { email: $('#email').value, password: $('#password').value };
-    if (tab === 'register') payload.business_name = $('#business').value;
 
     var btn = $('#authBtn');
     btn.disabled = true;
@@ -58,7 +56,15 @@
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.d.error || 'Gagal memproses.');
-        location.replace('/app/');
+        if (tab === 'register' || res.d.needs_verification) {
+          try {
+            if (res.d.verify_url) sessionStorage.setItem('clinqoo_verify_link', res.d.verify_url);
+            sessionStorage.setItem('clinqoo_verify_email', res.d.email || payload.email);
+          } catch (e) {}
+          location.replace('/daftar/verifikasi/');
+          return;
+        }
+        location.replace(res.d.redirect || '/app/');
       })
       .catch(function (err) {
         var m = $('#authMsg');

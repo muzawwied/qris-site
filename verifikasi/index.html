@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Aktivasi akun — Clinqoo</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/auth.css?v=2">
+<style>
+  body.onb-body { background: var(--paper); min-height: 100dvh; position: relative; overflow-x: hidden; margin: 0; }
+  body.onb-body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(to right, rgba(23,22,15,.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(23,22,15,.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 65% at 50% 38%, #000 30%, transparent 76%);
+    mask-image: radial-gradient(ellipse 80% 65% at 50% 38%, #000 30%, transparent 76%);
+  }
+  body.onb-body::after {
+    content: ""; position: fixed; width: 560px; height: 560px; right: -220px; bottom: -260px;
+    border-radius: 50%; pointer-events: none; z-index: 0;
+    background: radial-gradient(circle,
+      transparent 0 112px, rgba(161,101,47,.16) 112px 113.5px,
+      transparent 113.5px 166px, rgba(23,22,15,.06) 166px 167px,
+      transparent 167px 220px, rgba(161,101,47,.10) 220px 221.5px,
+      transparent 221.5px);
+  }
+  .onb { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; }
+  .onb__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px clamp(20px, 4vw, 46px); }
+  .onb__brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); }
+  .onb__brand img { width: 27px; height: 27px; border-radius: 50%; display: block; }
+  .onb__brand span { font-family: var(--serif); font-size: 20px; letter-spacing: -.015em; }
+  .onb__bar .onb__note { font-size: 12px; color: var(--muted); }
+  .onb__main { flex: 1; display: grid; place-items: start center; padding: 10px 20px 64px; }
+  .onb__card { width: 100%; max-width: 520px; background: var(--card, #fff); border: 1px solid var(--line); border-radius: 6px; padding: clamp(24px, 4vw, 38px); box-shadow: 0 1px 2px rgba(23,22,15,.04); }
+  .onb__step { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  .onb__card h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(25px, 3.6vw, 33px); line-height: 1.16; letter-spacing: -.02em; margin: 0 0 10px; }
+  .onb__card > p.lead { margin: 0 0 26px; font-size: 13.5px; line-height: 1.7; color: var(--muted); }
+  .onb__foot { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+  .onb__foot a { color: var(--ink); }
+  .onb__logo { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .onb__avatar { width: 62px; height: 62px; border-radius: 50%; background: #efeae1; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); font-family: var(--serif); font-size: 22px; color: var(--muted); }
+  .onb__avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .onb__logo .btn { --bg: transparent; }
+  .onb__logo small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+  .onb__check { display: flex; gap: 9px; align-items: flex-start; font-size: 12.5px; color: var(--muted); line-height: 1.6; margin: 0 0 18px; }
+  .onb__check input { margin-top: 2px; }
+  @media (max-width: 520px) { .onb__bar { padding: 18px 20px; } }
+</style>
+</head>
+<body class="onb-body">
+<header class="onb__bar">
+  <a class="onb__brand" href="/"><img src="/assets/brand/icon-48.png" alt=""> <span>Clinqoo</span></a>
+  <span class="onb__note">Langkah 1 dari 2</span>
+</header>
+
+<main class="onb__main">
+  <div class="onb__card">
+    <p class="onb__step">Aktivasi</p>
+    <h1 id="vTitle">Mengaktifkan akun…</h1>
+    <p class="lead" id="vText">Sebentar, kami periksa tautan aktivasi kamu.</p>
+    <div id="vMsg" class="banner" hidden></div>
+    <a class="btn btn--block" id="vAction" href="/masuk/" hidden>Masuk ke akun</a>
+    <div class="onb__foot" id="vFoot" hidden>
+      Butuh tautan baru? <a class="link-u" href="/daftar/verifikasi/">Kirim ulang dari halaman cek email</a>.
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var token = new URLSearchParams(location.search).get('t') || '';
+  var title = document.getElementById('vTitle');
+  var text = document.getElementById('vText');
+  var msg = document.getElementById('vMsg');
+  var action = document.getElementById('vAction');
+
+  function fail(t, m) {
+    title.textContent = t;
+    text.textContent = m;
+    msg.hidden = false;
+    msg.className = 'banner banner--err';
+    msg.textContent = 'Tautan tidak bisa dipakai.';
+    action.hidden = false;
+    action.textContent = 'Kembali ke halaman masuk';
+    action.href = '/masuk/';
+    document.getElementById('vFoot').hidden = false;
+  }
+
+  if (!token) { fail('Tautan tidak lengkap.', 'Buka tautan langsung dari email aktivasi kamu.'); return; }
+
+  fetch('/api/auth/verify', {
+    method: 'POST', credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: token })
+  })
+    .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+    .then(function (res) {
+      if (!res.ok) { fail('Tautan sudah tidak berlaku.', res.d.error || 'Coba kirim ulang email aktivasi.'); return; }
+      title.textContent = 'Akun aktif.';
+      text.textContent = 'Email kamu sudah terverifikasi. Lanjut isi profil usaha sebentar.';
+      try {
+        sessionStorage.removeItem('clinqoo_verify_link');
+        sessionStorage.removeItem('clinqoo_verify_email');
+      } catch (e) {}
+      location.replace(res.d.redirect || '/onboarding/');
+    })
+    .catch(function () { fail('Koneksi terputus.', 'Tautan belum diverifikasi. Coba buka lagi.'); });
+})();
+</script>
+</body>
+</html>
