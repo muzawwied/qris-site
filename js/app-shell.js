@@ -6,6 +6,7 @@
     { href: '/app/', label: 'Ringkasan', icon: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z' },
     { href: '/app/transaksi/', label: 'Transaksi', icon: 'M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01' },
     { href: '/app/statistik/', label: 'Statistik', icon: 'M4 20V10M10 20V4M16 20v-7M22 20H2' },
+    { href: '/app/transaksi/laporan/', label: 'Laporan', icon: 'M12 3v11M8 11l4 4 4-4M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2' },
     { href: '/app/penarikan/', label: 'Penarikan', icon: 'M12 3v13M7 11l5 5 5-5M4 21h16' },
     { href: '/app/integrasi/', label: 'Integrasi & API', icon: 'M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1' },
     { href: '/app/pengaturan/', label: 'Pengaturan', icon: '<svg width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'currentColor\' fill-rule=\'evenodd\' aria-hidden=\'true\'><path d=\'M10.61 4.83 L10.21 2.77 L13.79 2.77 L13.39 4.83 L16.08 5.95 L17.26 4.21 L19.79 6.74 L18.05 7.92 L19.17 10.61 L21.23 10.21 L21.23 13.79 L19.17 13.39 L18.05 16.08 L19.79 17.26 L17.26 19.79 L16.08 18.05 L13.39 19.17 L13.79 21.23 L10.21 21.23 L10.61 19.17 L7.92 18.05 L6.74 19.79 L4.21 17.26 L5.95 16.08 L4.83 13.39 L2.77 13.79 L2.77 10.21 L4.83 10.61 L5.95 7.92 L4.21 6.74 L6.74 4.21 L7.92 5.95 Z M15.5 12 A3.5 3.5 0 1 0 8.5 12 A3.5 3.5 0 1 0 15.5 12 Z\'/></svg>' }
@@ -14,6 +15,7 @@
   var path = location.pathname.replace(/\/index\.html$/, '/');
   if (path.charAt(path.length - 1) !== '/') path += '/';
   var current = path;
+  if (path.indexOf('/app/transaksi/laporan/') === 0) current = '/app/transaksi/laporan/';
   if (path.indexOf('/app/penarikan/') === 0) current = '/app/penarikan/';
   if (path.indexOf('/app/pengaturan/') === 0) current = '/app/pengaturan/';
 

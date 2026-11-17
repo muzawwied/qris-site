@@ -59,7 +59,10 @@
       <div class="panel">
         <div class="panel__head">
           <div><h2>Transaksi terakhir</h2><p>Lima tagihan paling baru di akunmu.</p></div>
-          <a class="link-u" href="/app/transaksi/" style="font-size:13px">Lihat semua</a>
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+            <a class="link-u" href="/app/transaksi/laporan/" style="font-size:13px">Unduh laporan</a>
+            <a class="link-u" href="/app/transaksi/" style="font-size:13px">Lihat semua</a>
+          </div>
         </div>
         <div class="tablewrap">
           <table class="data">
@@ -101,7 +104,7 @@
   </main>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/js/app-shell.js"></script>
+<script src="/js/app-shell.js?v=7"></script>
 <script src="/js/page-dashboard.js?v=5"></script>
 </body>
 </html>
