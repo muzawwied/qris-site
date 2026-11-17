@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Statistik — Clinqoo</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=3">
+<style>
+  .rangebar { display: flex; gap: 4px; border: 1px solid var(--line); border-radius: 3px; padding: 3px; background: var(--paper-2); }
+  .rangebar button {
+    appearance: none; border: 0; background: transparent; color: var(--muted);
+    font: inherit; font-size: 12.5px; padding: 6px 12px; border-radius: 2px; cursor: pointer;
+  }
+  .rangebar button.is-on { background: var(--ink); color: var(--paper); }
+
+  .chartcard { padding: 20px 20px 12px; }
+  .chartcard__head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 6px; flex-wrap: wrap; }
+  .chartcard__head h2 { font-family: var(--serif); font-weight: 400; font-size: 19px; letter-spacing: -.01em; margin: 0; }
+  .chartcard__head span { font-size: 12px; color: var(--muted); }
+  .chartbig { margin: 6px 0 0; font-family: var(--serif); font-weight: 300; font-size: 30px; letter-spacing: -.02em; line-height: 1.1; }
+  .chartwrap { position: relative; margin-top: 14px; }
+  .chartwrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .axis text { font-size: 10px; fill: var(--muted); font-family: var(--sans, Inter, sans-serif); }
+  .gridline { stroke: var(--line); stroke-width: 1; }
+  .tipbox {
+    position: absolute; pointer-events: none; background: var(--ink); color: var(--paper);
+    font-size: 11.5px; line-height: 1.5; padding: 7px 9px; border-radius: 3px;
+    transform: translate(-50%, -115%); white-space: nowrap; opacity: 0; transition: opacity .12s ease;
+  }
+  .tipbox.is-on { opacity: 1; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); margin-top: 10px; }
+  .legend i { display: inline-block; width: 16px; height: 2px; vertical-align: middle; margin-right: 6px; }
+  .split2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; margin-top: 16px; }
+  @media (max-width: 900px) { .split2 { grid-template-columns: 1fr; } }
+
+  .breakrow { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .breakrow:last-child { border-bottom: 0; }
+  .breakrow b { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .breakrow .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: 1px; }
+  .meter { height: 6px; background: var(--paper-3); border-radius: 99px; overflow: hidden; display: flex; margin: 4px 0 16px; }
+  .meter span { display: block; height: 100%; }
+  .hourbars { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; align-items: end; height: 74px; margin-top: 8px; }
+  .hourbars div { background: var(--paper-3); border-radius: 1px 1px 0 0; min-height: 2px; }
+  .hourbars div.is-peak { background: var(--money-bright); }
+  .hourlbl { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; font-size: 9px; color: var(--muted); margin-top: 5px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <div class="topbar">
+      <div><h1>Statistik</h1><p>Pergerakan omzet, tingkat keberhasilan, dan jam ramai transaksi.</p></div>
+      <div class="topbar__actions">
+        <div class="rangebar" id="rangebar">
+          <button data-days="7">7 hari</button>
+          <button data-days="30" class="is-on">30 hari</button>
+          <button data-days="90">90 hari</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats" style="margin-bottom:16px">
+      <div class="stat"><span>Omzet diterima</span><b class="money" id="kGross">Rp 0</b></div>
+      <div class="stat"><span>Dana bersih</span><b id="kNet">Rp 0</b></div>
+      <div class="stat"><span>Transaksi lunas</span><b id="kPaid">0</b></div>
+      <div class="stat"><span>Rata-rata tagihan</span><b id="kAvg">Rp 0</b></div>
+    </div>
+
+    <div class="panel chartcard">
+      <div class="chartcard__head">
+        <h2>Omzet harian</h2>
+        <span id="chartRange">—</span>
+      </div>
+      <p class="chartbig money" id="chartTotal">Rp 0</p>
+      <div class="chartwrap" id="chartwrap">
+        <svg id="chart" viewBox="0 0 760 240" preserveAspectRatio="none" role="img" aria-label="Grafik omzet harian"></svg>
+        <div class="tipbox" id="tip"></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--money-bright)"></i>Omzet lunas</span>
+        <span><i style="background:var(--line-strong)"></i>Tagihan dibuat</span>
+      </div>
+    </div>
+
+    <div class="split2">
+      <div class="panel" style="padding:20px">
+        <h2 style="font-family:var(--serif);font-weight:400;font-size:17px;margin:0 0 4px">Status transaksi</h2>
+        <p style="font-size:12px;color:var(--muted);margin:0 0 12px">Tingkat keberhasilan <b id="kRate">0%</b> dari semua tagihan pada periode ini.</p>
+        <div class="meter" id="meter"><span style="width:0;background:var(--money-bright)"></span><span style="width:0;background:var(--paper-3)"></span><span style="width:0;background:var(--line-strong)"></span></div>
+        <div id="statusRows"></div>
+      </div>
+
+      <div class="panel" style="padding:20px">
+        <h2 style="font-family:var(--serif);font-weight:400;font-size:17px;margin:0 0 4px">Jam ramai</h2>
+        <p style="font-size:12px;color:var(--muted);margin:0">Jam pembayaran terbanyak, waktu setempat.</p>
+        <div class="hourbars" id="hourbars"></div>
+        <div class="hourlbl"><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/app-shell.js?v=6"></script>
+<script>
+(function () {
+  'use strict';
+  var days = 30;
+  var data = null;
+
+  function rp(n) {
+    n = Math.round(Number(n) || 0);
+    return 'Rp ' + n.toLocaleString('id-ID');
+  }
+  function shortRp(n) {
+    n = Number(n) || 0;
+    if (n >= 1000000) return (n / 1000000).toFixed(n >= 10000000 ? 0 : 1).replace('.', ',') + ' jt';
+    if (n >= 1000) return Math.round(n / 1000) + ' rb';
+    return String(Math.round(n));
+  }
+  function dmy(iso) {
+    var p = iso.split('-');
+    return p[2] + '/' + p[1];
+  }
+  function el(id) { return document.getElementById(id); }
+
+  function renderChart() {
+    var s = data.series;
+    var W = 760, H = 240, padL = 44, padR = 8, padT = 12, padB = 26;
+    var innerW = W - padL - padR, innerH = H - padT - padB;
+    var maxGross = Math.max.apply(null, s.map(function (d) { return d.gross; }).concat([1]));
+    var maxTotal = Math.max.apply(null, s.map(function (d) { return d.total; }).concat([1]));
+    var rawMax = Math.max(maxGross, maxTotal, 1);
+    // Skala bulat: langkah 1/2/2,5/5 x 10^n sehingga label sumbu rapi.
+    function niceStep(v) {
+      var mag = Math.pow(10, Math.floor(Math.log(v) / Math.LN10));
+      var norm = v / mag;
+      var k = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10;
+      return k * mag;
+    }
+    var tickStep = niceStep(rawMax / 4);
+    var maxV = tickStep * 4;
+
+    function x(i) { return padL + (s.length === 1 ? innerW / 2 : (i / (s.length - 1)) * innerW); }
+    function yG(v) { return padT + innerH - (v / maxV) * innerH; }
+
+    var parts = [];
+    // garis bantu horizontal
+    for (var g = 0; g <= 4; g++) {
+      var yy = padT + (innerH / 4) * g;
+      parts.push('<line class="gridline" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + yy + '" y2="' + yy + '" stroke-dasharray="' + (g === 4 ? '0' : '3 4') + '"/>');
+      var val = maxV - tickStep * g;
+      parts.push('<text x="' + (padL - 8) + '" y="' + (yy + 3.5) + '" text-anchor="end">' + shortRp(val) + '</text>');
+    }
+
+    // area + garis omzet
+    var line = s.map(function (d, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + yG(d.gross).toFixed(1); }).join(' ');
+    var area = line + ' L' + x(s.length - 1).toFixed(1) + ' ' + (padT + innerH) + ' L' + x(0).toFixed(1) + ' ' + (padT + innerH) + ' Z';
+    parts.push('<defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#a1652f" stop-opacity="0.22"/><stop offset="100%" stop-color="#a1652f" stop-opacity="0"/>' +
+      '</linearGradient></defs>');
+    parts.push('<path d="' + area + '" fill="url(#gfill)"/>');
+    // batang tipis jumlah tagihan
+    var bw = Math.max(1.5, Math.min(9, innerW / s.length - 2));
+    s.forEach(function (d, i) {
+      var h = (d.total / maxV) * innerH;
+      parts.push('<rect x="' + (x(i) - bw / 2).toFixed(1) + '" y="' + (padT + innerH - h).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" fill="rgba(23,22,15,0.16)"/>');
+    });
+    parts.push('<path d="' + line + '" fill="none" stroke="#a1652f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>');
+
+    // titik + label sumbu
+    s.forEach(function (d, i) {
+      if (d.gross > 0) parts.push('<circle cx="' + x(i).toFixed(1) + '" cy="' + yG(d.gross).toFixed(1) + '" r="2.6" fill="#a1652f"/>');
+    });
+    var step = Math.max(1, Math.ceil(s.length / 8));
+    var lastLabel = -99;
+    s.forEach(function (d, i) {
+      if (i % step === 0 && (s.length - 1 - i) > step * 0.55) {
+        lastLabel = i;
+        parts.push('<text x="' + x(i).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle">' + dmy(d.date) + '</text>');
+      }
+    });
+    if (s.length - 1 - lastLabel >= step * 0.55) {
+      var li = s.length - 1;
+      parts.push('<text x="' + x(li).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="' + (x(li) > W - 30 ? 'end' : 'middle') + '">' + dmy(s[li].date) + '</text>');
+    }
+
+    var svg = el('chart');
+    svg.innerHTML = '<g class="axis">' + parts.join('') + '</g>';
+
+    // hover
+    var wrap = el('chartwrap'), tip = el('tip');
+    svg.onmousemove = function (ev) {
+      var rect = svg.getBoundingClientRect();
+      var rel = ((ev.clientX - rect.left) / rect.width) * W;
+      var i = Math.round(((rel - padL) / innerW) * (s.length - 1));
+      i = Math.max(0, Math.min(s.length - 1, i));
+      var d = s[i];
+      tip.innerHTML = dmy(d.date) + ' · ' + rp(d.gross) + '<br>' + d.paid + ' lunas / ' + d.total + ' tagihan';
+      tip.style.left = ((x(i) / W) * rect.width) + 'px';
+      tip.style.top = ((yG(d.gross) / H) * rect.height) + 'px';
+      tip.classList.add('is-on');
+    };
+    svg.onmouseleave = function () { tip.classList.remove('is-on'); };
+  }
+
+  function renderRest() {
+    var t = data.totals;
+    el('kGross').textContent = rp(t.gross);
+    el('kNet').textContent = rp(t.net);
+    el('kPaid').textContent = t.paid_count.toLocaleString('id-ID');
+    el('kAvg').textContent = rp(t.avg_ticket);
+    el('chartTotal').textContent = rp(t.gross);
+    el('chartRange').textContent = data.from.split('-').reverse().join('/') + ' – ' + data.to.split('-').reverse().join('/');
+    el('kRate').textContent = t.success_rate + '%';
+
+    var all = t.all_count || 1;
+    var rows = [
+      { label: 'Lunas', n: t.paid_count, color: 'var(--money-bright)' },
+      { label: 'Menunggu', n: t.pending_count, color: 'var(--paper-3)' },
+      { label: 'Kedaluwarsa', n: t.expired_count, color: 'var(--line-strong)' },
+      { label: 'Gagal', n: t.failed_count, color: 'rgba(23,22,15,0.35)' }
+    ];
+    el('meter').innerHTML = rows.map(function (r) {
+      return '<span style="width:' + ((r.n / all) * 100).toFixed(2) + '%;background:' + r.color + '"></span>';
+    }).join('');
+    el('statusRows').innerHTML = rows.map(function (r) {
+      return '<div class="breakrow"><span><i class="dot" style="background:' + r.color + '"></i>' + r.label + '</span>' +
+        '<b>' + r.n + ' · ' + Math.round((r.n / all) * 100) + '%</b></div>';
+    }).join('');
+
+    var hb = data.by_hour, maxH = Math.max.apply(null, hb.map(function (h) { return h.count; }).concat([1]));
+    el('hourbars').innerHTML = hb.map(function (h) {
+      var pct = Math.max(2, Math.round((h.count / maxH) * 100));
+      return '<div class="' + (h.count === maxH && h.count > 0 ? 'is-peak' : '') + '" style="height:' + pct + '%" title="' + String(h.hour).padStart(2, '0') + ':00 · ' + h.count + ' tagihan"></div>';
+    }).join('');
+  }
+
+  function load() {
+    fetch('/api/me/stats?days=' + days, { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.ok) return;
+        data = d;
+        renderChart();
+        renderRest();
+      })
+      .catch(function () {});
+  }
+
+  el('rangebar').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button');
+    if (!b) return;
+    days = parseInt(b.dataset.days, 10);
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('is-on', x === b); });
+    load();
+  });
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
+})();
+</script>
+</body>
+</html>

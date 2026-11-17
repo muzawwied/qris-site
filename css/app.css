@@ -151,3 +151,29 @@
 
 .side__brand .brand__logo { width: 28px; height: 28px; }
 .side__brand .brand__name { font-size: 20px; }
+
+/* CTA tagihan di dashboard */
+.cta-tagihan {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  margin: 0 0 18px; padding: 20px 22px; text-decoration: none;
+  background: var(--ink); color: var(--paper); border: 1px solid var(--ink); border-radius: var(--r, 3px);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.cta-tagihan:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -18px rgba(17,16,10,.55); }
+.cta-tagihan > div { display: grid; gap: 3px; }
+.cta-tagihan__eyebrow {
+  font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(247,244,238,.55); margin-bottom: 2px;
+}
+.cta-tagihan b { font-family: var(--serif); font-weight: 400; font-size: 20px; letter-spacing: -.01em; }
+.cta-tagihan > div > span:last-child { font-size: 12.5px; color: rgba(247,244,238,.66); }
+.cta-tagihan__go {
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid rgba(247,244,238,.28); display: grid; place-items: center; color: var(--paper);
+}
+.cta-tagihan:hover .cta-tagihan__go { background: rgba(247,244,238,.12); }
+@media (max-width: 560px) {
+  .cta-tagihan { padding: 16px 16px; gap: 12px; }
+  .cta-tagihan b { font-size: 18px; }
+  .cta-tagihan > div > span:last-child { font-size: 12px; }
+}
