@@ -44,11 +44,6 @@
             icon(n.icon) + '<span>' + n.label + '</span></a>';
         }).join('') +
         '</nav>' +
-        '<div class="side__label" style="margin-top:10px">Publik</div>' +
-        '<nav class="side__nav">' +
-        '<a class="side__link" href="/">' + icon('M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z') + '<span>Halaman utama</span></a>' +
-        '<a class="side__link" href="/docs/">' + icon('M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 13h6M9 17h4') + '<span>Dokumentasi</span></a>' +
-        '</nav>' +
         '<div class="side__foot">' +
         '<div class="side__user"><span class="side__avatar" id="sideAvatar"></span><div class="side__meta"><b id="sideName">—</b><span id="sideEmail">—</span></div></div>' +
         '<button class="side__logout" id="sideLogout">' + icon('M15 17l5-5-5-5M20 12H9M12 4H5v16h7') + '<span>Keluar</span></button>' +
