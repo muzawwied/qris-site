@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bayar di __NAME__ — QRIS</title>
+<meta name="description" content="Bayar ke __NAME__ dengan QRIS. Isi nominal, pindai, selesai.">
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .shop { max-width: 520px; margin: 0 auto; padding: 44px 22px 64px; }
+  .shop__mark { width: 54px; height: 54px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-family: var(--serif); font-size: 24px; margin-bottom: 22px; }
+  .shop h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 8vw, 46px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 10px; }
+  .shop__lead { color: var(--muted); font-size: 15px; margin: 0 0 28px; max-width: 34ch; }
+  .shop__label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin: 22px 0 8px; }
+  .shop__amount { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line-strong); padding-bottom: 10px; }
+  .shop__amount span { font-family: var(--serif); font-size: 26px; color: var(--muted); }
+  .shop__amount input { flex: 1; border: 0; background: transparent; font-family: var(--serif); font-size: clamp(30px, 9vw, 44px); color: var(--ink); outline: none; width: 100%; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .chipbtn { border: 1px solid var(--line-strong); background: transparent; border-radius: 999px; padding: 8px 14px; font-size: 13px; color: var(--ink); cursor: pointer; font-family: var(--sans); }
+  .chipbtn:hover { background: rgba(23,22,15,.05); }
+  .shop__note { width: 100%; border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 13px 15px; font: inherit; color: var(--ink); background: transparent; margin-top: 4px; }
+  .shop__pay { width: 100%; margin-top: 26px; }
+  .shop__msg { font-size: 13px; color: #8a3b2f; margin: 12px 0 0; min-height: 18px; }
+  .shop__foot { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .shop__foot a { color: var(--ink); }
+  .rules { display: grid; gap: 10px; margin: 30px 0 0; }
+  .rules div { display: flex; gap: 10px; font-size: 13px; color: var(--muted); }
+  .rules b { color: var(--ink); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<header class="nav is-stuck">
+  <div class="wrap nav__inner">
+    <a class="brand" href="/"><span class="brand__mark">Q</span> QRIS.SITE</a>
+    <nav class="nav__links">
+      <a href="/#cara">Cara kerja</a>
+      <a href="/harga/">Harga</a>
+      <a href="/docs/">Dokumentasi</a>
+    </nav>
+  </div>
+</header>
+
+<main class="shop">
+  <div class="shop__mark" id="shopMark">__INITIAL__</div>
+  <h1 id="shopName">__NAME__</h1>
+  <p class="shop__lead">Isi nominal yang mau dibayar, lalu pindai QRIS dengan aplikasi bank atau e-wallet apa pun.</p>
+
+  <form id="shopForm" novalidate>
+    <label class="shop__label" for="amount">Nominal</label>
+    <div class="shop__amount">
+      <span>Rp</span>
+      <input id="amount" inputmode="numeric" autocomplete="off" placeholder="0" aria-label="Nominal pembayaran">
+    </div>
+    <div class="chips" id="chips">
+      <button class="chipbtn" type="button" data-amount="25000">25.000</button>
+      <button class="chipbtn" type="button" data-amount="50000">50.000</button>
+      <button class="chipbtn" type="button" data-amount="100000">100.000</button>
+      <button class="chipbtn" type="button" data-amount="150000">150.000</button>
+    </div>
+
+    <label class="shop__label" for="note">Catatan untuk penjual (opsional)</label>
+    <input class="shop__note" id="note" maxlength="80" autocomplete="off" placeholder="Meja 4, pesanan #12">
+
+    <button class="btn shop__pay" id="pay" type="submit">Lanjut ke pembayaran</button>
+    <p class="shop__msg" id="msg"></p>
+  </form>
+
+  <div class="rules">
+    <div><b>0,7%</b><span>biaya hanya dipotong saat pembayaran berhasil.</span></div>
+    <div><b>15 menit</b><span>QR berlaku, lewat dari itu nominal bisa dibuat ulang.</span></div>
+    <div><b>Semua bank</b><span>QRIS diterima GoPay, OVO, DANA, ShopeePay, dan m-banking.</span></div>
+  </div>
+
+  <div class="shop__foot">
+    <span>Dibuat dengan QRIS.SITE</span>
+    <a href="/">Terima QRIS di usahamu</a>
+  </div>
+</main>
+
+<script>
+(function () {
+  var SLUG = '__SLUG__';
+  var input = document.getElementById('amount');
+  var msg = document.getElementById('msg');
+  var btn = document.getElementById('pay');
+
+  function rupiah(n) { return n ? n.toLocaleString('id-ID') : ''; }
+
+  input.addEventListener('input', function () {
+    var digits = input.value.replace(/[^0-9]/g, '').slice(0, 9);
+    input.value = digits ? rupiah(parseInt(digits, 10)) : '';
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.chipbtn'), function (b) {
+    b.addEventListener('click', function () {
+      input.value = rupiah(parseInt(b.getAttribute('data-amount'), 10));
+      input.focus();
+    });
+  });
+
+  document.getElementById('shopForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var amount = parseInt(input.value.replace(/[^0-9]/g, ''), 10);
+    if (!amount || amount < 1000) { msg.textContent = 'Nominal minimal Rp 1.000.'; input.focus(); return; }
+    btn.disabled = true;
+    btn.textContent = 'Menyiapkan QRIS…';
+    msg.textContent = '';
+    fetch('/api/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: amount, description: (document.getElementById('note').value || '').trim() || ('Pembayaran ke ' + document.getElementById('shopName').textContent) })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.checkout_url) { location.href = d.checkout_url; return; }
+        btn.disabled = false;
+        btn.textContent = 'Lanjut ke pembayaran';
+        msg.textContent = (d && d.error) || 'Gagal membuat tagihan. Coba lagi.';
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Lanjut ke pembayaran';
+        msg.textContent = 'Koneksi terputus. Coba lagi.';
+      });
+  });
+
+  fetch('/api/store/' + encodeURIComponent(SLUG))
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d && d.business_name) {
+        document.getElementById('shopName').textContent = d.business_name;
+        document.getElementById('shopMark').textContent = d.business_name.trim().charAt(0).toUpperCase();
+        document.title = 'Bayar di ' + d.business_name + ' — QRIS';
+      }
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>

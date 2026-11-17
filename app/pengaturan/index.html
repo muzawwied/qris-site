@@ -22,6 +22,8 @@
         <form id="profileForm">
           <div class="field"><label for="business">Nama usaha</label><input id="business" type="text" maxlength="80" required></div>
           <div class="field"><label for="email">Email</label><input id="email" type="email" disabled></div>
+          <div class="field"><label for="slug">Link toko</label><input id="slug" type="text" maxlength="32" placeholder="nama-toko" autocomplete="off"></div>
+          <p class="muted" style="font-size:12px;margin:-6px 0 12px">Alamat publik: /toko/<span id="slugPreview">nama-toko</span></p>
           <div id="profileMsg" class="banner" hidden></div>
           <button class="btn btn--sm" type="submit">Simpan perubahan</button>
         </form>
@@ -39,6 +41,16 @@
     </div>
 
     <div class="panel" style="margin-top:18px">
+      <div class="panel__head"><div><h2>Link toko</h2><p>Satu tautan untuk dibagikan di bio, WhatsApp, atau struk. Pembeli isi nominal sendiri, QRIS dibuat otomatis.</p></div></div>
+      <div class="cred__row">
+        <div class="keybox" id="shopLink" style="flex:1;min-width:0">memuat…</div>
+        <button class="btn btn--ghost btn--sm" id="copyShop" type="button">Salin</button>
+        <a class="btn btn--ghost btn--sm" id="openShop" href="#" target="_blank" rel="noopener">Buka</a>
+      </div>
+      <p class="muted" style="font-size:12px;margin:10px 0 0">Ubah nama link di kolom <b>Link toko</b> pada profil usaha.</p>
+    </div>
+
+    <div class="panel" style="margin-top:18px">
       <div class="panel__head"><div><h2>Sesi</h2><p>Keluar dari perangkat ini.</p></div></div>
       <button class="btn btn--ghost btn--sm" id="logout">Keluar dari akun</button>
     </div>
@@ -46,6 +58,7 @@
 </div>
 <div class="toast" id="toast"></div>
 <script src="/js/app-shell.js"></script>
-<script src="/js/page-pengaturan.js"></script>
+<script src="/js/page-pengaturan.js?v=2"></script>
+<script src="/js/pengaturan-toko.js"></script>
 </body>
 </html>

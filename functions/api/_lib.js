@@ -399,6 +399,7 @@ export function publicUser(u) {
     business_name: u.business_name,
     plan: u.plan || 'warung',
     merchant_id: u.merchant_id || null,
+    store_slug: u.store_slug || null,
     api_key: u.api_key || null,
     created_at: u.created_at,
   };
@@ -451,6 +452,7 @@ export async function ensureUsersMerchantId(env) {
     await env.DB.prepare('UPDATE users SET merchant_id = ? WHERE id = ?')
       .bind('mch_' + randomToken(10), r.id).run();
   }
+  await ensureUsersStoreSlug(env);
 }
 
 export function newMerchantId() {
@@ -503,4 +505,43 @@ export function publicWithdrawal(w) {
     updated_at: w.updated_at,
     processed_at: w.processed_at || null,
   };
+}
+
+export function slugify(input) {
+  const base = String(input || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 32);
+  return base || 'toko';
+}
+
+let slugEnsured = false;
+
+// Link toko: satu alamat tetap per akun, dipakai pembeli untuk bayar nominal bebas.
+export async function ensureUsersStoreSlug(env) {
+  if (slugEnsured) return;
+  try {
+    await env.DB.prepare('ALTER TABLE users ADD COLUMN store_slug TEXT').run();
+  } catch (e) {
+    /* sudah ada */
+  }
+  const rows = await env.DB.prepare(
+    "SELECT id, business_name FROM users WHERE store_slug IS NULL OR store_slug = ''"
+  ).all();
+  for (const r of rows.results || []) {
+    let base = slugify(r.business_name);
+    let candidate = base;
+    let n = 2;
+    for (;;) {
+      const taken = await env.DB.prepare('SELECT id FROM users WHERE store_slug = ? LIMIT 1')
+        .bind(candidate).first();
+      if (!taken) break;
+      candidate = base.slice(0, 28) + '-' + n;
+      n += 1;
+    }
+    await env.DB.prepare('UPDATE users SET store_slug = ? WHERE id = ?').bind(candidate, r.id).run();
+  }
+  slugEnsured = true;
 }

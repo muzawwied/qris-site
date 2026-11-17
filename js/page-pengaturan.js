@@ -8,6 +8,7 @@
     if (!u) { location.href = '/app/'; return; }
     $('#business').value = u.business_name || '';
     $('#email').value = u.email || '';
+    if (u.store_slug && !$('#slug').dataset.touched) $('#slug').value = u.store_slug;
   });
 
   $('#profileForm').addEventListener('submit', function (ev) {
@@ -16,7 +17,7 @@
     fetch('/api/me/profile', {
       method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ business_name: $('#business').value })
+      body: JSON.stringify({ business_name: $('#business').value, store_slug: $('#slug').value })
     })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
