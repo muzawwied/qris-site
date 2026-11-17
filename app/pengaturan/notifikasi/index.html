@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Notifikasi — Clinqoo</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=3">
+<link rel="stylesheet" href="/css/settings.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <a class="back" href="/app/pengaturan/">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      Pengaturan
+    </a>
+    <div class="topbar"><div><h1>Notifikasi</h1><p>Kabar pembayaran masuk lewat Telegram, tanpa buka dashboard.</p></div></div>
+
+    <div class="panel panel--narrow">
+      <div class="panel__head">
+        <div><h2>Telegram</h2><p id="tgState">Memeriksa status…</p></div>
+        <span class="status-label" id="tgBadge"><i></i> Memuat</span>
+      </div>
+
+      <div id="tgOff">
+        <p class="muted" style="font-size:13px;margin:0 0 14px">Tekan tombol di bawah, lalu tekan <b>Start</b> di Telegram. Setelah itu setiap tagihan lunas dikirim ke chat kamu.</p>
+        <button class="btn btn--sm" id="tgLink" type="button">Hubungkan Telegram</button>
+        <div id="tgManual" hidden style="margin-top:18px">
+          <p class="muted" style="font-size:12px;margin:0 0 8px">Belum bisa buka otomatis? Buka bot ini lalu kirim perintah di bawah.</p>
+          <div class="keybox" id="tgCmd" style="word-break:break-all">/start</div>
+        </div>
+      </div>
+
+      <div id="tgOn" hidden>
+        <p class="muted" style="font-size:13px;margin:0 0 14px" id="tgSince">Terhubung.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn--ghost btn--sm" id="tgTest" type="button">Kirim pesan uji</button>
+          <button class="btn btn--ghost btn--sm" id="tgUnlink" type="button">Putuskan</button>
+        </div>
+      </div>
+
+      <div id="tgMsg" class="banner" hidden></div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/js/app-shell.js?v=10"></script>
+<script src="/js/page-pengaturan-notifikasi.js"></script>
+</body>
+</html>

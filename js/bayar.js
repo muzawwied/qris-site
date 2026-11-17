@@ -93,6 +93,26 @@
 
     var merchant = p.merchant_name || 'Penjual';
     $('#merchantName').textContent = merchant;
+    document.title = 'Pembayaran ' + merchant;
+    var accentMap = { coklat: '#8a5a2b', biru: '#2b4a6f', hitam: '#1a1a18' };
+    if (p.merchant_accent && accentMap[p.merchant_accent]) {
+      document.documentElement.style.setProperty('--brand', accentMap[p.merchant_accent]);
+    }
+    var barBrand = document.querySelector('.co-bar__brand');
+    if (barBrand) {
+      var nameEl = barBrand.querySelector('.brand__name');
+      var logoEl = barBrand.querySelector('.brand__logo');
+      if (nameEl) nameEl.textContent = merchant;
+      if (logoEl && p.merchant_logo) logoEl.src = p.merchant_logo;
+      if (p.merchant_slug) barBrand.href = '/' + p.merchant_slug;
+    }
+    if (p.merchant_logo) {
+      var markImg = document.createElement('img');
+      markImg.src = p.merchant_logo; markImg.alt = '';
+      markImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit';
+      var markEl = $('#merchantMark');
+      if (markEl) { markEl.textContent = ''; markEl.appendChild(markImg); }
+    }
     $('#merchantMark').textContent = merchant.trim().charAt(0).toUpperCase() || 'Q';
     $('#title').textContent = p.description || 'Pembayaran QRIS';
     $('#amount').textContent = fmt(p.amount);

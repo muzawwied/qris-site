@@ -1,5 +1,5 @@
 import {
-  ensureSchema, ensureUsersStoreSlug, ensureUsersVerified, slugify, json, cors, readJson, currentUser, publicUser,
+  ensureSchema, ensureUsersStoreSlug, ensureUsersVerified, ensureBrandChannels, slugify, json, cors, readJson, currentUser, publicUser,
 } from '../_lib.js';
 
 export async function onRequestOptions() { return cors(); }
@@ -9,6 +9,7 @@ export async function onRequestPost({ request, env }) {
   await ensureSchema(env);
   await ensureUsersStoreSlug(env);
   await ensureUsersVerified(env);
+  await ensureBrandChannels(env);
   const user = await currentUser(request, env);
   if (!user) return json({ error: 'Silakan masuk dulu.' }, 401);
 
@@ -29,6 +30,13 @@ export async function onRequestPost({ request, env }) {
       .bind(slug, user.id).first();
     if (taken) return json({ error: 'Link itu sudah dipakai akun lain.' }, 409);
     patch.store_slug = slug;
+  }
+
+  if (body && body.brand_accent !== undefined) {
+    const raw = String(body.brand_accent || '').trim().toLowerCase();
+    const allowed = ['', 'coklat', 'biru', 'hitam'];
+    if (!allowed.includes(raw)) return json({ error: 'Pilihan warna tidak dikenal.' }, 400);
+    patch.brand_accent = raw || null;
   }
 
   if (body && body.logo !== undefined) {

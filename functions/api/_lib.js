@@ -312,6 +312,63 @@ export async function logEvent(env, paymentId, type, payload) {
   }
 }
 
+
+
+// ===== Merek (white label) & notifikasi Telegram =====
+let brandReady = false;
+export async function ensureBrandChannels(env) {
+  if (brandReady) return;
+  const cols = [
+    'ALTER TABLE users ADD COLUMN brand_accent TEXT',
+    'ALTER TABLE users ADD COLUMN telegram_chat_id TEXT',
+    'ALTER TABLE users ADD COLUMN telegram_code TEXT',
+    'ALTER TABLE users ADD COLUMN telegram_linked_at TEXT',
+  ];
+  for (const sql of cols) {
+    try { await env.DB.prepare(sql).run(); } catch (e) { /* kolom sudah ada */ }
+  }
+  brandReady = true;
+}
+
+export async function sendTelegram(env, chatId, text) {
+  const token = env.TELEGRAM_BOT_TOKEN;
+  if (!token || !chatId) return false;
+  try {
+    const res = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true }),
+    });
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function notifyPaid(env, row) {
+  try {
+    const u = await env.DB.prepare(
+      'SELECT business_name, telegram_chat_id FROM users WHERE id = ? LIMIT 1'
+    ).bind(row.user_id).first();
+    if (!u || !u.telegram_chat_id) return;
+
+    const rp = (n) => 'Rp ' + Math.round(Number(n) || 0).toLocaleString('id-ID');
+    const net = (Number(row.amount) || 0) - (Number(row.fee) || 0);
+    const lines = [
+      '<b>Pembayaran masuk</b>',
+      rp(row.amount),
+      '',
+      (row.description ? String(row.description) : 'Tagihan QRIS'),
+      (u.business_name ? 'Toko: ' + u.business_name : ''),
+      'Bersih: ' + rp(net) + ' (biaya ' + rp(row.fee) + ')',
+      new Date().toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB',
+    ].filter(Boolean);
+    await sendTelegram(env, u.telegram_chat_id, lines.join('\n'));
+  } catch (e) {
+    /* notifikasi tidak boleh menggagalkan transaksi */
+  }
+}
+
 export async function markPaid(env, row, info = {}) {
   const ts = nowIso();
   await env.DB.prepare(
@@ -320,6 +377,7 @@ export async function markPaid(env, row, info = {}) {
     .bind(ts, ts, info.issuer || null, info.raw ? JSON.stringify(info.raw) : null, row.id)
     .run();
   await logEvent(env, row.id, 'paid', info);
+  await notifyPaid(env, row);
 }
 
 

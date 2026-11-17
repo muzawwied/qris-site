@@ -1,4 +1,4 @@
-import { ensureSchema, json, cors, publicPayment } from '../_lib.js';
+import { ensureSchema, ensureBrandChannels, json, cors, publicPayment } from '../_lib.js';
 
 export async function onRequestOptions() {
   return cors();
@@ -7,11 +7,12 @@ export async function onRequestOptions() {
 // GET /api/pay/:id — status terkini satu tagihan
 export async function onRequestGet({ params, env }) {
   await ensureSchema(env);
+  await ensureBrandChannels(env);
   const id = String(params.id || '').trim();
   if (!id) return json({ error: 'id wajib.' }, 400);
 
   const row = await env.DB.prepare(
-    `SELECT p.*, u.business_name AS merchant_name
+    `SELECT p.*, u.business_name AS merchant_name, u.logo AS merchant_logo, u.brand_accent AS merchant_accent, u.store_slug AS merchant_slug
        FROM payments p LEFT JOIN users u ON u.id = p.user_id
       WHERE p.id = ? OR p.reference = ? LIMIT 1`
   ).bind(id, id).first();
@@ -28,5 +29,8 @@ export async function onRequestGet({ params, env }) {
 
   const out = publicPayment(row);
   out.merchant_name = row.merchant_name || null;
+  out.merchant_logo = row.merchant_logo || null;
+  out.merchant_accent = row.merchant_accent || null;
+  out.merchant_slug = row.merchant_slug || null;
   return json(out);
 }
