@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>QRIS tagihan — Clinqoo</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=3">
+<style>
+  body.fx-body { min-height: 100dvh; background: var(--paper); position: relative; overflow-x: hidden; }
+  body.fx-body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(to right, rgba(23,22,15,.038) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(23,22,15,.038) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 10%, #000 20%, transparent 80%);
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 10%, #000 20%, transparent 80%);
+  }
+  .fx-bar {
+    position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 18px clamp(18px, 4vw, 44px); border-bottom: 1px solid var(--line);
+    background: rgba(247,244,238,.9); backdrop-filter: blur(8px); position: sticky; top: 0;
+  }
+  .fx-brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); }
+  .fx-brand img { width: 27px; height: 27px; border-radius: 50%; display: block; }
+  .fx-brand span { font-family: var(--serif); font-size: 20px; letter-spacing: -.015em; }
+  .fx-back { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: 3px; }
+  .fx-back:hover { color: var(--ink); background: rgba(23,22,15,.04); }
+
+  .hq { position: relative; z-index: 1; width: min(100% - 36px, 940px); margin-inline: auto; padding: clamp(26px, 4vw, 44px) 0 70px; }
+  .hq__head { margin-bottom: 20px; }
+  .hq__title { font-family: var(--serif); font-weight: 400; font-size: clamp(27px, 3.8vw, 38px); line-height: 1.1; letter-spacing: -.025em; margin: 6px 0 8px; }
+  .hq__sub { font-size: 13px; color: var(--muted); margin: 0; }
+
+  .hq__card { display: grid; grid-template-columns: 300px 1fr; gap: 0; background: var(--paper-2); border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+  .hq__qr { padding: 24px; border-right: 1px solid var(--line); display: grid; place-items: center; gap: 14px; background: #fff; }
+  .hq__qr img { width: 232px; height: 232px; display: block; }
+  .hq__qr .muted { font-size: 11.5px; text-align: center; }
+  .hq__info { padding: 24px 26px; display: flex; flex-direction: column; }
+  .hq__amount { font-family: var(--serif); font-weight: 300; font-size: clamp(34px, 5vw, 46px); letter-spacing: -.03em; line-height: 1; margin: 2px 0 14px; }
+  .hq__meta { display: grid; gap: 0; margin-bottom: 18px; }
+  .hq__row { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .hq__row span { color: var(--muted); }
+  .hq__row b { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+  .hq__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; }
+  .hq__foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+  .hq__foot a { font-size: 12.5px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  .hq__hint { font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+  @media (max-width: 760px) {
+    .hq__card { grid-template-columns: 1fr; }
+    .hq__qr { border-right: 0; border-bottom: 1px solid var(--line); }
+    .hq__actions { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body class="fx-body">
+<header class="fx-bar">
+  <a class="fx-brand" href="/app/"><img src="/assets/brand/icon-48.png" alt="Clinqoo"> <span>Clinqoo</span></a>
+  <a class="fx-back" href="/app/tagihan/">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+    Buat tagihan lain
+  </a>
+</header>
+
+<main class="hq">
+  <div class="hq__head">
+    <p class="eyebrow">Tagihan QRIS</p>
+    <h1 class="hq__title" id="hqTitle">Tagihan siap dibagikan.</h1>
+    <p class="hq__sub" id="hqSub">Pembeli scan QR di bawah, statusnya terpantau otomatis di halaman ini.</p>
+  </div>
+
+  <div class="hq__card">
+    <div class="hq__qr">
+      <img id="qrImg" alt="QRIS tagihan" src="">
+      <a class="btn btn--ghost btn--sm" id="downloadQr" href="#" download="qris.png" style="width:100%;text-align:center">Unduh QR</a>
+      <span class="muted" id="validNote">Berlaku 15 menit sejak dibuat.</span>
+    </div>
+
+    <div class="hq__info">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <span class="eyebrow" style="margin:0">Status</span>
+        <span class="status-label" id="statusLabel"><i></i> menunggu</span>
+      </div>
+      <p class="hq__amount money" id="amount">—</p>
+
+      <div class="hq__meta">
+        <div class="hq__row"><span>Nomor tagihan</span><b class="mono" id="payId">—</b></div>
+        <div class="hq__row"><span>Keterangan</span><b id="desc">—</b></div>
+        <div class="hq__row"><span>Biaya 0,7%</span><b id="fee">—</b></div>
+        <div class="hq__row"><span>Masuk ke kamu</span><b id="net" style="color:var(--money)">—</b></div>
+      </div>
+
+      <div class="hq__actions">
+        <button class="btn btn--sm" id="copyLink" type="button">Salin tautan</button>
+        <button class="btn btn--ghost btn--sm" id="shareBtn" type="button">Bagikan</button>
+        <a class="btn btn--ghost btn--sm" id="openCheckout" href="#" target="_blank" rel="noopener">Buka checkout</a>
+        <a class="btn btn--ghost btn--sm" id="viewQr" href="#" target="_blank" rel="noopener">QR publik</a>
+      </div>
+      <p class="hq__hint">Tautan pendek: <span class="mono" id="shortLink">—</span></p>
+    </div>
+  </div>
+
+  <div class="hq__foot">
+    <a href="/app/transaksi/">Lihat semua transaksi</a>
+    <a href="/app/">Kembali ke dashboard</a>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var fmt = function (n) { return 'Rp ' + Math.round(Number(n) || 0).toLocaleString('id-ID'); };
+  var parts = location.pathname.replace(/\/$/, '').split('/');
+  var id = decodeURIComponent(parts[parts.length - 1] || '') || new URLSearchParams(location.search).get('id') || '';
+  var link = '';
+
+  function toast(m) {
+    var t = $('#toast'); if (!t) return;
+    t.textContent = m; t.classList.add('is-on');
+    setTimeout(function () { t.classList.remove('is-on'); }, 2200);
+  }
+
+  function paint(d) {
+    $('#amount').textContent = fmt(d.amount);
+    $('#payId').textContent = d.id;
+    $('#desc').textContent = d.description || '—';
+    $('#fee').textContent = fmt(d.fee);
+    $('#net').textContent = fmt(d.net_amount);
+    if (d.qr_image) {
+      $('#qrImg').src = d.qr_image;
+      $('#downloadQr').href = d.qr_image;
+    }
+    link = d.checkout_url || (location.origin + '/bayar/' + encodeURIComponent(d.id) + '/');
+    $('#openCheckout').href = '/bayar/' + encodeURIComponent(d.id) + '/';
+    $('#viewQr').href = '/q/' + encodeURIComponent(d.id) + '/';
+    $('#shortLink').textContent = location.origin.replace(/^https?:\/\//, '') + '/q/' + d.id;
+    var st = String(d.status || 'pending');
+    var el = $('#statusLabel');
+    el.className = 'status-label ' + (st === 'paid' ? 'status-label--ok' : st === 'expired' ? 'status-label--off' : 'status-label--wait');
+    el.innerHTML = '<i></i> ' + (st === 'paid' ? 'dibayar' : st === 'expired' ? 'kedaluwarsa' : st === 'failed' ? 'gagal' : 'menunggu');
+    if (st === 'paid') {
+      $('#hqTitle').textContent = 'Tagihan sudah lunas.';
+      $('#hqSub').textContent = 'Dana masuk ke saldo akunmu, siap diajukan cair.';
+      $('#validNote').textContent = 'Pembayaran diterima.';
+    }
+  }
+
+  function load() {
+    if (!id) { $('#hqTitle').textContent = 'Tagihan tidak ditemukan.'; $('#hqSub').textContent = 'Kembali ke halaman buat tagihan untuk membuat QRIS baru.'; return; }
+    fetch('/api/pay/' + encodeURIComponent(id), { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d && d.id) paint(d); })
+      .catch(function () {});
+  }
+
+  $('#copyLink').addEventListener('click', function () {
+    var out = location.origin + '/q/' + id;
+    if (navigator.clipboard) navigator.clipboard.writeText(out).then(function () { toast('Tautan disalin.'); });
+    else window.prompt('Salin tautan:', out);
+  });
+  $('#shareBtn').addEventListener('click', function () {
+    var url = location.origin + '/q/' + id;
+    if (navigator.share) navigator.share({ title: 'Tagihan QRIS', text: 'Bayar lewat QRIS: ' + url, url: url }).catch(function () {});
+    else { $('#copyLink').click(); }
+  });
+
+  load();
+  setInterval(load, 6000);
+})();
+</script>
+</body>
+</html>

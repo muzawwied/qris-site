@@ -44,19 +44,8 @@
         var d = res.d || {};
         if (!res.ok && !d.id) throw new Error(d.error || 'Gagal membuat tagihan.');
 
-        $('#resultPanel').hidden = false;
-        $('#hintPanel').hidden = true;
-        $('#resAmount').textContent = fmt(d.amount);
-        $('#resId').textContent = d.id;
-        $('#resFee').textContent = fmt(d.fee);
-        $('#resNet').textContent = fmt(d.net_amount);
-        if (d.qr_image) $('#qrImg').src = d.qr_image;
-        lastLink = d.checkout_url || '';
-        $('#openCheckout').href = lastLink;
-        window.__qrisShort = location.origin + '/q/' + encodeURIComponent(d.id);
-        var vq = document.getElementById('viewQr');
-        if (vq) vq.href = '/qris/?id=' + encodeURIComponent(d.id);
-        toast('Tagihan dibuat.');
+        // Form dan tampilan QR dipisah: langsung ke halaman tagihan.
+        location.href = '/app/tagihan/hasil/' + encodeURIComponent(d.id) + '/';
       })
       .catch(function (err) {
         msg.hidden = false; msg.textContent = err.message;

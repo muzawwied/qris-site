@@ -93,33 +93,12 @@
         </form>
       </div>
 
-      <div class="panel" id="resultPanel" hidden>
-        <div class="panel__head">
-          <div><h2>Tagihan siap</h2><p id="resultSub">Bagikan QR atau link ke pembeli.</p></div>
-          <span class="status-label status-label--wait"><i></i> menunggu</span>
-        </div>
-        <img id="qrImg" alt="QRIS" style="width:220px;height:220px;border:1px solid var(--line);border-radius:3px;padding:8px;background:#fff;margin:0 auto 16px">
-        <div style="text-align:center;font-family:var(--serif);font-size:28px" id="resAmount">—</div>
-        <div class="kv">
-          <div class="kv__row"><span>Nomor tagihan</span><b class="mono" id="resId">—</b></div>
-          <div class="kv__row"><span>Biaya 0,7%</span><b id="resFee">—</b></div>
-          <div class="kv__row"><span>Masuk ke kamu</span><b id="resNet" style="color:var(--money)">—</b></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
-          <a class="btn btn--ghost btn--sm" id="openCheckout" href="#" target="_blank" rel="noopener">Buka checkout</a>
-          <button class="btn btn--sm" id="copyLink" type="button">Salin tautan</button>
-          <a class="btn btn--ghost btn--sm" id="viewQr" href="#" target="_blank" rel="noopener">QR publik</a>
-          <button class="btn btn--ghost btn--sm" id="shareQris" type="button">Bagikan</button>
-        </div>
-        <p class="muted" style="font-size:12px;margin-top:12px">Masa berlaku 15 menit sejak dibuat.</p>
-      </div>
-
       <div class="panel" id="hintPanel">
-        <div class="panel__head"><div><h2>Belum ada tagihan</h2><p>Isi nominal di sebelah, QR langsung jadi.</p></div></div>
+        <div class="panel__head"><div><h2>Setelah dibuat</h2><p>QR tampil di halaman tersendiri, siap dibagikan.</p></div></div>
         <ul style="margin:0;padding-left:18px;display:grid;gap:9px;font-size:13.5px;color:var(--ink-soft)">
-          <li>Pembeli bisa scan dari aplikasi apa pun.</li>
-          <li>Status berubah otomatis saat lunas.</li>
-          <li>Link checkout bisa dibagikan lewat WhatsApp.</li>
+          <li>Kamu diarahkan ke halaman QR begitu tagihan jadi.</li>
+          <li>Dari sana QR bisa disalin, dibagikan, atau dibuka pembeli.</li>
+          <li>Status lunas ikut terpantau otomatis di halaman itu.</li>
         </ul>
       </div>
     </div>
