@@ -15,6 +15,7 @@
   if (path.charAt(path.length - 1) !== '/') path += '/';
   var current = path;
   if (path.indexOf('/app/penarikan/') === 0) current = '/app/penarikan/';
+  if (path.indexOf('/app/pengaturan/') === 0) current = '/app/pengaturan/';
 
   function icon(path) {
     return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="' + path + '"/></svg>';
@@ -47,7 +48,7 @@
         '<a class="side__link" href="/docs/">' + icon('M8 9l-4 3 4 3M16 9l4 3-4 3') + '<span>Dokumentasi</span></a>' +
         '</nav>' +
         '<div class="side__foot">' +
-        '<div class="side__user"><span class="side__avatar" id="sideAvatar"></span><b id="sideName">—</b><span id="sideEmail">—</span></div>' +
+        '<div class="side__user"><span class="side__avatar" id="sideAvatar"></span><div class="side__meta"><b id="sideName">—</b><span id="sideEmail">—</span></div></div>' +
         '<button class="side__logout" id="sideLogout">' + icon('M15 17l5-5-5-5M20 12H9M12 4H5v16h7') + '<span>Keluar</span></button>' +
         '</div>';
       host.insertBefore(side, host.firstChild);
@@ -102,7 +103,8 @@
         av.innerHTML = user.logo ? '<img alt="" src="' + user.logo + '">' : initial;
         av.classList.toggle('has-photo', !!user.logo);
       }
-      if (mail) mail.textContent = user.email || '';
+      if (mail) { mail.textContent = user.email || ''; mail.title = user.email || ''; }
+      if (name) name.title = user.business_name || '';
     }
   }
 

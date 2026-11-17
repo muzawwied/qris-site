@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Link toko — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=2">
+<link rel="stylesheet" href="/css/creds.css">
+<link rel="stylesheet" href="/css/settings.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <a class="back" href="/app/pengaturan/">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      Pengaturan
+    </a>
+    <div class="topbar"><div><h1>Link toko</h1><p>Alamat yang dibagikan ke pembeli. Nominal diisi sendiri oleh mereka.</p></div></div>
+
+    <div class="panel panel--narrow">
+      <div class="panel__head"><div><h2>Tautan publik</h2><p>Bagikan di bio, WhatsApp, atau struk.</p></div></div>
+      <div class="cred__row">
+        <div class="keybox" id="shopLink" style="flex:1;min-width:0">memuat…</div>
+        <button class="btn btn--ghost btn--sm" id="copyShop" type="button">Salin</button>
+        <a class="btn btn--ghost btn--sm" id="openShop" href="#" target="_blank" rel="noopener">Buka</a>
+      </div>
+
+      <form id="tokoForm" style="margin-top:22px">
+        <div class="field"><label for="slug">Nama link</label><input id="slug" type="text" maxlength="32" placeholder="nama-toko" autocomplete="off"></div>
+        <p class="muted" style="font-size:12px;margin:-6px 0 14px">Alamat jadi: /toko/<span id="slugPreview">nama-toko</span></p>
+        <div id="tokoMsg" class="banner" hidden></div>
+        <button class="btn btn--sm" type="submit">Simpan nama link</button>
+      </form>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/js/app-shell.js"></script>
+<script src="/js/page-pengaturan-toko-link.js"></script>
+</body>
+</html>

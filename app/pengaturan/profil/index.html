@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Profil usaha — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=2">
+<link rel="stylesheet" href="/css/creds.css">
+<link rel="stylesheet" href="/css/settings.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <a class="back" href="/app/pengaturan/">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      Pengaturan
+    </a>
+    <div class="topbar"><div><h1>Profil usaha</h1><p>Foto dan nama yang dilihat pembeli saat membayar.</p></div></div>
+
+    <div class="panel panel--narrow">
+      <form id="profileForm">
+        <div class="avatar-row">
+          <div class="avatar" id="avatarPreview"><span id="avatarInitial">K</span></div>
+          <div class="avatar-row__actions">
+            <label class="btn btn--ghost btn--sm" for="logoInput">Ganti foto</label>
+            <input id="logoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+            <button class="btn btn--ghost btn--sm" type="button" id="logoRemove">Hapus</button>
+            <p class="muted" style="font-size:12px;margin:0">JPG atau PNG, otomatis diperkecil.</p>
+          </div>
+        </div>
+        <div class="field"><label for="business">Nama usaha</label><input id="business" type="text" maxlength="80" required></div>
+        <div class="field"><label for="email">Email</label><input id="email" type="email" disabled></div>
+        <div id="profileMsg" class="banner" hidden></div>
+        <button class="btn btn--sm" type="submit">Simpan perubahan</button>
+      </form>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/js/app-shell.js"></script>
+<script src="/js/page-pengaturan-profil.js"></script>
+</body>
+</html>

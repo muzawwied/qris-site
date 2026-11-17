@@ -3,6 +3,31 @@
   var $ = function (s) { return document.querySelector(s); };
   function toast(m) { var el = $('#toast'); if (!el) return; el.textContent = m; el.classList.add('is-on'); setTimeout(function () { el.classList.remove('is-on'); }, 2200); }
 
+  document.addEventListener('session', function (ev) {
+    var u = ev.detail.user;
+    if (!u) { location.href = '/masuk/'; return; }
+    $('#business').value = u.business_name || '';
+    $('#email').value = u.email || '';
+  });
+
+  $('#profileForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var msg = $('#profileMsg');
+    fetch('/api/me/profile', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ business_name: $('#business').value })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        msg.hidden = false;
+        msg.className = 'banner' + (res.ok ? '' : ' banner--err');
+        msg.textContent = res.ok ? 'Profil tersimpan.' : (res.d.error || 'Gagal menyimpan.');
+        if (res.ok) toast('Profil tersimpan.');
+      })
+      .catch(function () { msg.hidden = false; msg.className = 'banner banner--err'; msg.textContent = 'Gagal menyimpan.'; });
+  });
+
   var current = null;
 
   function paint(logo, name) {
@@ -72,4 +97,5 @@
     if (!current) { toast('Belum ada foto.'); return; }
     save('');
   });
+
 })();
