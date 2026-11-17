@@ -6,24 +6,24 @@
 <title>Dokumentasi API — QRIS.SITE</title>
 <meta name="description" content="Dokumentasi API QRIS.SITE: buat tagihan QRIS, cek status pembayaran, dan terima webhook bertanda tangan.">
 <meta name="theme-color" content="#f7f4ee">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
 <header class="nav is-stuck">
   <div class="wrap nav__inner">
-    <a class="brand" href="index.html"><span class="brand__mark">Q</span> QRIS.SITE</a>
+    <a class="brand" href="/"><span class="brand__mark">Q</span> QRIS.SITE</a>
     <nav class="nav__links">
-      <a href="index.html#buat">Buat tagihan</a>
-      <a href="index.html#harga">Harga</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="api.html" style="color:var(--ink)">Dokumentasi</a>
+      <a href="/app/tagihan/">Buat tagihan</a>
+      <a href="/harga/">Harga</a>
+      <a href="/masuk/">Dashboard</a>
+      <a href="/docs/" style="color:var(--ink)">Dokumentasi</a>
     </nav>
-    <div class="nav__cta"><a class="btn btn--sm" href="index.html#buat">Buat tagihan</a></div>
+    <div class="nav__cta"><a class="btn btn--sm" href="/app/tagihan/">Buat tagihan</a></div>
   </div>
 </header>
 
@@ -83,7 +83,7 @@
   "qr_string": "0002010102122667...",
   "qr_image": "https://api.qrserver.com/v1/create-qr-code/?...",
   "expires_at": "2026-11-17T14:00:00.000Z",
-  "checkout_url": "https://qris-site.pages.dev/bayar.html?id=pay_m3k9a1f2b7c4"
+  "checkout_url": "https://qris-site.pages.dev/bayar/pay_m3k9a1f2b7c4"
 }</pre>
 
     <p>Bagikan <code>checkout_url</code> ke pembeli, atau render <code>qr_image</code> sendiri di halaman tokomu. Tagihan berlaku 15 menit.</p>
@@ -120,7 +120,10 @@ if (req.headers['x-signature'] !== expected) {
 }</pre>
     <p>Alternatif sederhana: kirim secret yang sama pada header <code>X-Webhook-Token</code>.</p>
 
-    <h2 id="admin">Endpoint admin</h2>
+    <h2 id="penarikan">Penarikan</h2><p>Pencairan saldo tidak otomatis: pengguna mengajukan lewat <code>POST /api/me/withdrawals</code>, lalu admin memprosesnya. Saldo tersedia = total net transaksi lunas − pengajuan yang masih berjalan.</p><pre>curl -X POST https://qris-site.pages.dev/api/me/withdrawals \
+  -H "Content-Type: application/json" \
+  -H "Cookie: qris_session=..." \
+  -d '{"amount":50000,"bank_name":"BCA","account_number":"1234567890","account_name":"Nama Pemilik"}'</pre><h2 id="admin">Endpoint admin</h2>
     <p>Memakai header <code>Authorization: Bearer &lt;ADMIN_TOKEN&gt;</code>.</p>
     <table class="doc-table">
       <thead><tr><th>Endpoint</th><th>Fungsi</th></tr></thead>
@@ -154,7 +157,7 @@ while (status === 'pending') {
 }
 console.log('Hasil akhir:', status);</pre>
 
-    <p style="margin-top:36px"><a class="link-u" href="index.html">Kembali ke beranda</a></p>
+    <p style="margin-top:36px"><a class="link-u" href="/">Kembali ke beranda</a></p>
   </div>
 </main>
 
@@ -162,7 +165,7 @@ console.log('Hasil akhir:', status);</pre>
   <div class="wrap">
     <div class="foot__bottom" style="margin-top:0;border-top:0;padding-top:0">
       <span>© 2026 QRIS.SITE</span>
-      <span><a href="legal.html">Syarat &amp; privasi</a></span>
+      <span><a href="/legal/">Syarat &amp; privasi</a></span>
     </div>
   </div>
 </footer>

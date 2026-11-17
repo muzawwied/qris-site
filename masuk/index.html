@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Masuk — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<header id="siteHeader"></header>
+
+<main class="wrap" style="padding:56px 0 90px">
+  <div class="auth">
+    <p class="eyebrow">Akun usaha</p>
+    <h1 class="h2" style="font-size:34px">Masuk untuk kelola pembayaran.</h1>
+    <p class="muted" style="font-size:14px;margin-top:10px">Semua tagihan yang kamu buat akan tercatat di akun ini.</p>
+
+    <div class="panel" style="margin-top:22px">
+      <div class="auth__switch">
+        <button type="button" id="tabLogin" class="is-on">Masuk</button>
+        <button type="button" id="tabRegister">Daftar</button>
+      </div>
+      <form id="authForm">
+        <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="kamu@usaha.id" required></div>
+        <div class="field" id="bizField" hidden><label for="business">Nama usaha</label><input id="business" type="text" maxlength="80" placeholder="Kedai Kopi Senja"></div>
+        <div class="field"><label for="password">Password</label><input id="password" type="password" minlength="8" autocomplete="current-password" placeholder="Minimal 8 karakter" required></div>
+        <div id="authMsg" class="banner banner--err" hidden></div>
+        <button class="btn btn--block" type="submit" id="authBtn">Masuk</button>
+      </form>
+    </div>
+    <p class="muted" style="font-size:12px;margin-top:14px">Dengan masuk, kamu setuju pada <a class="link-u" href="/legal/" style="font-size:12px">syarat layanan</a>.</p>
+  </div>
+</main>
+
+<footer id="siteFooter"></footer>
+<div class="toast" id="toast"></div>
+<script src="/js/site.js"></script>
+<script src="/js/page-masuk.js"></script>
+</body>
+</html>

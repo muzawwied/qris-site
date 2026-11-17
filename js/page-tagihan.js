@@ -55,7 +55,7 @@
         $('#openCheckout').href = lastLink;
         window.__qrisShort = location.origin + '/q/' + encodeURIComponent(d.id);
         var vq = document.getElementById('viewQr');
-        if (vq) vq.href = 'qris.html?id=' + encodeURIComponent(d.id);
+        if (vq) vq.href = '/qris/?id=' + encodeURIComponent(d.id);
         toast('Tagihan dibuat.');
       })
       .catch(function (err) {
@@ -81,5 +81,5 @@
     });
   }
 
-  document.addEventListener('session', function (ev) { if (!ev.detail.user) location.href = 'dashboard.html'; });
+  document.addEventListener('session', function (ev) { if (!ev.detail.user) location.href = '/app/'; });
 })();

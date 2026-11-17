@@ -5,7 +5,7 @@
 
   document.addEventListener('session', function (ev) {
     var u = ev.detail.user;
-    if (!u) { location.href = 'dashboard.html'; return; }
+    if (!u) { location.href = '/app/'; return; }
     $('#business').value = u.business_name || '';
     $('#email').value = u.email || '';
   });
@@ -49,6 +49,6 @@
   $('#logout').addEventListener('click', function () {
     fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
       .catch(function () {})
-      .finally(function () { location.href = 'dashboard.html'; });
+      .finally(function () { location.href = '/app/'; });
   });
 })();

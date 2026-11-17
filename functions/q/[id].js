@@ -1,6 +1,11 @@
-// Tautan pendek publik: /q/<id> -> halaman QRIS
-export async function onRequestGet({ request, params }) {
-  const id = String(params.id || '').trim();
+// Tampilkan halaman tanpa mengubah URL (rewrite ke aset statis).
+export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
-  return Response.redirect(url.origin + '/qris.html?id=' + encodeURIComponent(id), 302);
+  const assetUrl = new URL('/qris/', url.origin);
+  const res = await env.ASSETS.fetch(new Request(assetUrl.toString(), { headers: request.headers }));
+  const body = await res.text();
+  return new Response(body, {
+    status: 200,
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+  });
 }

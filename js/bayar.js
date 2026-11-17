@@ -13,6 +13,10 @@
   };
 
   var id = new URLSearchParams(location.search).get('id') || '';
+  if (!id) {
+    var seg = location.pathname.replace(/\/+$/, '').split('/');
+    if (seg.length && /^pay_|^usr_/.test(seg[seg.length - 1])) id = seg[seg.length - 1];
+  }
   var $ = function (s) { return document.querySelector(s); };
 
   var loading = $('#loading');
@@ -83,7 +87,7 @@
     renderCountdown();
 
     var big = document.getElementById('bigQrLink');
-    if (big) big.href = 'qris.html?id=' + encodeURIComponent(p.id);
+    if (big) big.href = '/qris/' + encodeURIComponent(p.id);
 
     if (p.qr_image) {
       qrImg.src = p.qr_image;
@@ -134,7 +138,7 @@
   }
 
   if (!id) {
-    fail('ID tagihan tidak ada di URL. Contoh: /bayar.html?id=pay_xxxx');
+    fail('ID tagihan tidak ada di tautan. Contoh: /bayar/pay_xxxx');
   } else {
     load(true);
     pollTimer = setInterval(function () {

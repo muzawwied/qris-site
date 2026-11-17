@@ -8,11 +8,11 @@
 <meta name="theme-color" content="#f7f4ee">
 <meta property="og:title" content="Pembayaran QRIS">
 <meta property="og:description" content="Scan QRIS untuk menyelesaikan pembayaran.">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 <style>
   body { background: var(--paper); }
   .qrpage { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 18px 40px; }
@@ -48,7 +48,7 @@
 </head>
 <body>
 <main class="qrpage">
-  <a class="qrpage__brand" href="index.html"><span class="brand__mark" style="width:24px;height:24px;font-size:11px">Q</span> QRIS.SITE</a>
+  <a class="qrpage__brand" href="/"><span class="brand__mark" style="width:24px;height:24px;font-size:11px">Q</span> QRIS.SITE</a>
 
   <section class="qrpage__card" id="card" hidden>
     <div class="qrpage__status" id="status"><i></i> Menunggu pembayaran</div>
@@ -68,7 +68,7 @@
     </div>
     <div class="qrpage__links">
       <a class="link-u" id="checkoutLink" href="#" style="font-size:12.5px">Halaman pembayaran</a>
-      <a class="link-u" href="index.html" style="font-size:12.5px">Buat tagihan</a>
+      <a class="link-u" href="/" style="font-size:12.5px">Buat tagihan</a>
     </div>
   </section>
 
@@ -76,12 +76,12 @@
     <p class="eyebrow" style="margin-bottom:8px">QRIS</p>
     <h1 class="h3" style="margin-bottom:10px">Tagihan tidak ditemukan</h1>
     <p class="muted" style="font-size:13.5px">Periksa kembali tautan yang dibagikan, atau buat tagihan baru.</p>
-    <a class="btn btn--sm" href="index.html#buat" style="margin-top:18px">Buat tagihan</a>
+    <a class="btn btn--sm" href="/app/tagihan/" style="margin-top:18px">Buat tagihan</a>
   </div>
 
   <p class="qrpage__foot">Scan dengan aplikasi e-wallet atau mobile banking apa pun yang mendukung QRIS. Nominal sudah terisi otomatis.</p>
 </main>
 <div class="toast" id="toast"></div>
-<script src="js/page-qris.js"></script>
+<script src="/js/page-qris.js"></script>
 </body>
 </html>

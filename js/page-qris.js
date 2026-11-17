@@ -2,6 +2,10 @@
   'use strict';
   var $ = function (s) { return document.querySelector(s); };
   var id = new URLSearchParams(location.search).get('id') || '';
+  if (!id) {
+    var seg = location.pathname.replace(/\/+$/, '').split('/');
+    if (seg.length && /^pay_/.test(seg[seg.length - 1])) id = seg[seg.length - 1];
+  }
   var current = null;
   var timer = null;
 
@@ -33,7 +37,7 @@
     $('#amount').textContent = fmt(p.amount);
     $('#desc').textContent = p.description || '';
     $('#qrImg').src = p.qr_image || '';
-    $('#checkoutLink').href = 'bayar.html?id=' + encodeURIComponent(p.id);
+    $('#checkoutLink').href = '/bayar/' + encodeURIComponent(p.id);
     statusUi(p.status);
     tick();
   }

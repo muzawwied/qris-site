@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Penarikan — QRIS.SITE</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <div class="topbar">
+      <div><h1>Penarikan</h1><p>Pencairan saldo diajukan manual, lalu diproses 1×24 jam kerja.</p></div>
+      <div class="topbar__actions"><a class="btn btn--ghost btn--sm" href="/app/transaksi/">Lihat transaksi</a></div>
+    </div>
+
+    <div class="stats" style="margin-bottom:18px">
+      <div class="stat"><span>Saldo tersedia</span><b class="money" id="bAvail">Rp 0</b></div>
+      <div class="stat"><span>Total diterima</span><b id="bEarned">Rp 0</b></div>
+      <div class="stat"><span>Sedang diajukan</span><b id="bPending">Rp 0</b></div>
+      <div class="stat"><span>Sudah dicairkan</span><b id="bDone">Rp 0</b></div>
+    </div>
+
+    <div class="grid-2" style="align-items:start">
+      <div class="panel">
+        <div class="panel__head"><div><h2>Ajukan pencairan</h2><p>Minimal Rp 10.000. Dana dikirim ke rekening yang kamu isi.</p></div></div>
+        <form id="wdForm">
+          <div class="field">
+            <label for="amount">Nominal (Rp)</label>
+            <input id="amount" type="number" min="10000" step="1000" value="10000" required>
+            <div class="field__hint">Maksimal sesuai saldo tersedia.</div>
+          </div>
+          <div class="field">
+            <label for="bank">Bank / e-wallet</label>
+            <input id="bank" type="text" maxlength="60" placeholder="BCA / GoPay / Mandiri" required>
+          </div>
+          <div class="field">
+            <label for="acc">Nomor rekening</label>
+            <input id="acc" type="text" inputmode="numeric" maxlength="32" placeholder="1234567890" required>
+          </div>
+          <div class="field">
+            <label for="holder">Nama pemilik rekening</label>
+            <input id="holder" type="text" maxlength="80" placeholder="Nama sesuai buku tabungan" required>
+          </div>
+          <div id="wdMsg" class="banner" hidden></div>
+          <button class="btn btn--block" type="submit" id="wdBtn">Ajukan pencairan</button>
+        </form>
+      </div>
+
+      <div class="panel" style="padding:0;overflow:hidden">
+        <div class="panel__head" style="padding:20px 20px 0"><div><h2>Riwayat pengajuan</h2><p>Status terbaru dari tim keuangan.</p></div></div>
+        <div class="tablewrap" style="border:0;border-top:1px solid var(--line);border-radius:0">
+          <table class="data" style="min-width:520px">
+            <thead><tr><th>Diajukan</th><th style="text-align:right">Nominal</th><th>Tujuan</th><th>Status</th></tr></thead>
+            <tbody id="wdRows"></tbody>
+          </table>
+          <div class="empty" id="wdEmpty" hidden>Belum ada pengajuan.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/js/app-shell.js"></script>
+<script src="/js/page-penarikan.js"></script>
+</body>
+</html>

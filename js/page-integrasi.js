@@ -31,5 +31,5 @@
     $('#hMode').textContent = h.mode === 'live' ? 'Live' : 'Percobaan';
   }).catch(function () { $('#hApi').textContent = 'Tidak terjangkau'; });
 
-  document.addEventListener('session', function (ev) { if (ev.detail.user) loadKey(); else location.href = 'dashboard.html'; });
+  document.addEventListener('session', function (ev) { if (ev.detail.user) loadKey(); else location.href = '/app/'; });
 })();

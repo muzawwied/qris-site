@@ -93,7 +93,7 @@ export async function onRequestPost({ request, env }) {
     qr_string: q.qr_string || null,
     qr_image: qrImage,
     expires_at: expiresAt,
-    checkout_url: `${new URL(request.url).origin}/bayar.html?id=${id}`,
+    checkout_url: `${new URL(request.url).origin}/bayar/${id}`,
   });
 }
 

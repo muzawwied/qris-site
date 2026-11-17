@@ -50,6 +50,21 @@ CREATE TABLE IF NOT EXISTS sessions (
   expires_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+CREATE TABLE IF NOT EXISTS withdrawals (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  amount INTEGER NOT NULL,
+  bank_name TEXT,
+  account_number TEXT,
+  account_name TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  processed_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_withdrawals_user ON withdrawals(user_id);
+CREATE INDEX IF NOT EXISTS idx_withdrawals_status ON withdrawals(status);
 `;
 
 let schemaReady = false;
@@ -408,4 +423,43 @@ export async function ensurePaymentsUserId(env) {
   } catch (e) {
     /* sudah ada */
   }
+}
+
+
+// ===== Saldo & penarikan =====
+export async function balanceOf(env, userId) {
+  const paid = await env.DB.prepare(
+    "SELECT COALESCE(SUM(net_amount),0) AS n FROM payments WHERE user_id = ? AND status = 'paid'"
+  ).bind(userId).first();
+  const held = await env.DB.prepare(
+    "SELECT COALESCE(SUM(amount),0) AS n FROM withdrawals WHERE user_id = ? AND status IN ('pending','approved')"
+  ).bind(userId).first();
+  const done = await env.DB.prepare(
+    "SELECT COALESCE(SUM(amount),0) AS n FROM withdrawals WHERE user_id = ? AND status = 'paid'"
+  ).bind(userId).first();
+  const earned = Number(paid && paid.n || 0);
+  const heldN = Number(held && held.n || 0);
+  const doneN = Number(done && done.n || 0);
+  return {
+    earned,
+    withdrawn: doneN,
+    pending: heldN,
+    available: Math.max(0, earned - heldN - doneN),
+  };
+}
+
+export function publicWithdrawal(w) {
+  if (!w) return null;
+  return {
+    id: w.id,
+    amount: w.amount,
+    bank_name: w.bank_name,
+    account_number: w.account_number,
+    account_name: w.account_name,
+    status: w.status,
+    note: w.note || null,
+    created_at: w.created_at,
+    updated_at: w.updated_at,
+    processed_at: w.processed_at || null,
+  };
 }

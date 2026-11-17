@@ -42,7 +42,7 @@
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.d.error || 'Gagal memproses.');
-        location.reload();
+        location.href = '/app/';
       })
       .catch(function (err) {
         $('#authMsg').hidden = false;
@@ -81,7 +81,7 @@
             '<td class="mono">' + esc(p.reference || p.id) + '</td>' +
             '<td class="num">' + fmt(p.amount) + '</td>' +
             '<td>' + statusBadge(p.status) + '</td>' +
-            '<td><a class="link-u" style="font-size:12px" href="bayar.html?id=' + encodeURIComponent(p.id) + '" target="_blank" rel="noopener">Buka</a></td></tr>';
+            '<td><a class="link-u" style="font-size:12px" href="/bayar/?id=' + encodeURIComponent(p.id) + '" target="_blank" rel="noopener">Buka</a></td></tr>';
         }).join('');
         $('#recentEmpty').hidden = list.length > 0;
 

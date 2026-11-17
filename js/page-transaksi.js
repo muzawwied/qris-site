@@ -16,7 +16,7 @@
       '&status=' + encodeURIComponent(state.status) + '&q=' + encodeURIComponent(state.q);
 
     fetch(url, { credentials: 'same-origin' })
-      .then(function (r) { if (r.status === 401) { location.href = 'dashboard.html'; throw new Error('auth'); } return r.json(); })
+      .then(function (r) { if (r.status === 401) { location.href = '/app/'; throw new Error('auth'); } return r.json(); })
       .then(function (d) {
         var s = d.summary || {};
         $('#sToday').textContent = fmt(s.today_paid);
@@ -33,7 +33,7 @@
             '<td class="num">' + fmt(p.amount) + '</td>' +
             '<td class="num">' + fmt(p.fee) + '</td>' +
             '<td>' + badge(p.status) + '</td>' +
-            '<td><a class="link-u" style="font-size:12px" href="bayar.html?id=' + encodeURIComponent(p.id) + '" target="_blank" rel="noopener">Buka</a></td></tr>';
+            '<td><a class="link-u" style="font-size:12px" href="/bayar/' + encodeURIComponent(p.id) + '" target="_blank" rel="noopener">Buka</a></td></tr>';
         }).join('');
         $('#empty').hidden = list.length > 0;
         $('#countInfo').textContent = list.length
@@ -58,5 +58,5 @@
   $('#prevBtn').addEventListener('click', function () { if (state.offset > 0) { state.offset -= state.limit; load(); } });
   $('#nextBtn').addEventListener('click', function () { state.offset += state.limit; load(); });
 
-  document.addEventListener('session', function (ev) { if (ev.detail.user) load(); else location.href = 'dashboard.html'; });
+  document.addEventListener('session', function (ev) { if (ev.detail.user) load(); else location.href = '/app/'; });
 })();
