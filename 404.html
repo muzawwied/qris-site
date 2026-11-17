@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Halaman tidak ditemukan — Clinqoo</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body.nf-body { background: var(--paper); min-height: 100dvh; position: relative; overflow-x: hidden; }
+  /* Motif: grid buku besar tipis + cincin tipis di sudut, tanpa panel gelap */
+  body.nf-body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(to right, rgba(23,22,15,.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(23,22,15,.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 65% at 50% 42%, #000 35%, transparent 78%);
+    mask-image: radial-gradient(ellipse 80% 65% at 50% 42%, #000 35%, transparent 78%);
+  }
+  body.nf-body::after {
+    content: ""; position: fixed; width: 620px; height: 620px; right: -240px; bottom: -280px;
+    border-radius: 50%; pointer-events: none; z-index: 0;
+    background: radial-gradient(circle,
+      transparent 0 118px, rgba(161,101,47,.20) 118px 119.5px,
+      transparent 119.5px 174px, rgba(23,22,15,.07) 174px 175px,
+      transparent 175px 230px, rgba(161,101,47,.12) 230px 231.5px,
+      transparent 231.5px);
+  }
+  .nf { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; }
+  .nf__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px clamp(20px, 4vw, 46px); }
+  .nf__brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); }
+  .nf__brand img { width: 27px; height: 27px; border-radius: 50%; display: block; }
+  .nf__brand span { font-family: var(--serif); font-size: 20px; letter-spacing: -.015em; }
+  .nf__bar a.nf__back { font-size: 12.5px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+  .nf__main { flex: 1; display: grid; place-items: center; padding: 20px clamp(20px, 5vw, 40px) 56px; }
+  .nf__inner { width: 100%; max-width: 560px; text-align: center; }
+  .nf__code { font-family: var(--serif); font-weight: 300; font-size: clamp(84px, 13vw, 150px); line-height: .86; letter-spacing: -.06em; margin: 0 0 14px; color: var(--ink); }
+  .nf__rule { width: 46px; height: 1px; background: var(--line-strong); margin: 0 auto 22px; }
+  .nf__inner h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(25px, 3.4vw, 34px); line-height: 1.18; letter-spacing: -.02em; margin: 0 0 12px; }
+  .nf__inner > p { margin: 0 auto 28px; max-width: 420px; font-size: 13.5px; line-height: 1.7; color: var(--muted); }
+  .nf__actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 34px; }
+  .nf__links { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 26px; margin: 0; padding: 20px 0 0; border-top: 1px solid var(--line); }
+  .nf__links a { font-size: 13px; color: var(--ink-soft); text-decoration: none; padding: 6px 0; border-bottom: 1px solid transparent; transition: border-color .18s ease; }
+  .nf__links a:hover { border-bottom-color: var(--line-strong); }
+  @media (max-width: 520px) {
+    .nf__bar { padding: 18px 20px; }
+    .nf__links { gap: 0 18px; }
+    .nf__actions .btn { flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body class="nf-body">
+<div class="nf">
+  <div class="nf__bar">
+    <a class="nf__brand" href="/"><img src="/assets/brand/icon-48.png" alt="Clinqoo"> <span>Clinqoo</span></a>
+    <a class="nf__back" href="/">Kembali ke beranda</a>
+  </div>
+
+  <main class="nf__main">
+    <div class="nf__inner">
+      <p class="nf__code">404</p>
+      <div class="nf__rule"></div>
+      <p class="eyebrow">Halaman tidak ditemukan</p>
+      <h1>Tautannya tidak menemukan apa pun.</h1>
+      <p>Alamat ini tidak ada di sistem kami. Mungkin salah ketik, atau tagihannya sudah kedaluwarsa dan dihapus.</p>
+
+      <div class="nf__actions">
+        <a class="btn btn--sm" href="/app/">Buka dashboard</a>
+        <a class="btn btn--ghost btn--sm" href="/docs/">Lihat dokumentasi</a>
+      </div>
+
+      <ul class="nf__links">
+        <li><a href="/">Beranda</a></li>
+        <li><a href="/produk">Produk</a></li>
+        <li><a href="/harga">Harga</a></li>
+        <li><a href="/faq">FAQ</a></li>
+        <li><a href="/masuk/">Masuk</a></li>
+      </ul>
+    </div>
+  </main>
+</div>
+</body>
+</html>
