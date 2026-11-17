@@ -23,7 +23,7 @@
     header.id = 'nav';
     header.innerHTML =
       '<div class="wrap nav__inner">' +
-        '<a class="brand" href="/"><span class="brand__mark">Q</span> QRIS.SITE</a>' +
+        '<a class="brand" href="/"><img class="brand__logo" src="/assets/brand/icon-48.png" srcset="/assets/brand/icon-48.png 1x, /assets/brand/icon-192.png 4x" width="30" height="30" alt=""> <span class="brand__name">Clinqoo</span></a>' +
         '<nav class="nav__links" id="navLinks">' +
           NAV.map(function (n) {
             return '<a href="' + n.href + '"' + (active(n.href) ? ' style="color:var(--ink)"' : '') + '>' + n.label + '</a>';
@@ -59,7 +59,7 @@
       '<div class="wrap">' +
         '<div class="foot__grid">' +
           '<div class="foot__brand">' +
-            '<a class="brand" href="/"><span class="brand__mark">Q</span> QRIS.SITE</a>' +
+            '<a class="brand" href="/"><img class="brand__logo" src="/assets/brand/icon-48.png" srcset="/assets/brand/icon-48.png 1x, /assets/brand/icon-192.png 4x" width="30" height="30" alt=""> <span class="brand__name">Clinqoo</span></a>' +
             '<p>Payment gateway QRIS untuk penjual Indonesia. Tagihan cepat, dana masuk rekening.</p>' +
           '</div>' +
           '<div><h4>Produk</h4><ul>' +
@@ -80,7 +80,7 @@
           '</ul></div>' +
         '</div>' +
         '<div class="foot__bottom">' +
-          '<span>© 2026 QRIS.SITE</span>' +
+          '<span>© 2026 Clinqoo</span>' +
           '<span>QRIS diproses melalui penyedia jasa pembayaran berizin Bank Indonesia.</span>' +
         '</div>' +
       '</div>';

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Laporan — Clinqoo</title>
+<meta name="theme-color" content="#f7f4ee">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=3">
+<link rel="stylesheet" href="/css/settings.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <main class="main">
+    <a class="back" href="/app/transaksi/">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      Transaksi
+    </a>
+    <div class="topbar"><div><h1>Laporan</h1><p>Unduh data transaksi periode tertentu untuk pembukuan.</p></div></div>
+
+    <div class="grid-2" style="align-items:start">
+      <div class="panel">
+        <div class="panel__head"><div><h2>Periode</h2><p>Pilih rentang tanggal laporan.</p></div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+          <button class="btn btn--ghost btn--sm" data-preset="month" type="button">Bulan ini</button>
+          <button class="btn btn--ghost btn--sm" data-preset="last" type="button">Bulan lalu</button>
+          <button class="btn btn--ghost btn--sm" data-preset="7" type="button">7 hari</button>
+          <button class="btn btn--ghost btn--sm" data-preset="30" type="button">30 hari</button>
+        </div>
+        <div class="field"><label for="from">Dari</label><input id="from" type="date"></div>
+        <div class="field"><label for="to">Sampai</label><input id="to" type="date"></div>
+        <div id="msg" class="banner" hidden></div>
+        <a class="btn btn--sm" id="download" href="#" style="width:100%;justify-content:center">Unduh CSV</a>
+        <p class="muted" style="font-size:11.5px;margin:12px 0 0">File CSV bisa dibuka di Excel, Numbers, atau Google Sheets.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><div><h2>Ringkasan</h2><p id="rangeLabel">—</p></div></div>
+        <div class="kv">
+          <div class="kv__row"><span>Transaksi masuk</span><b id="rCount">—</b></div>
+          <div class="kv__row"><span>Transaksi lunas</span><b id="rPaid">—</b></div>
+          <div class="kv__row"><span>Nominal lunas</span><b id="rGross">—</b></div>
+          <div class="kv__row"><span>Biaya layanan</span><b id="rFee">—</b></div>
+          <div class="kv__row"><span>Diterima</span><b id="rNet">—</b></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/js/app-shell.js"></script>
+<script src="/js/page-laporan.js"></script>
+</body>
+</html>

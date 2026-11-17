@@ -1,4 +1,4 @@
-# QRIS.SITE
+# Clinqoo
 
 Web + backend penerima pembayaran QRIS. Berjalan di Cloudflare Pages (Functions + D1).
 

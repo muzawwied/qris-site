@@ -33,7 +33,7 @@
       side.id = 'side';
       side.innerHTML =
         '<div class="side__top">' +
-        '<a class="side__brand" href="/"><span class="brand__mark">Q</span> QRIS.SITE</a>' +
+        '<a class="side__brand" href="/"><img class="brand__logo" src="/assets/brand/icon-48.png" srcset="/assets/brand/icon-48.png 1x, /assets/brand/icon-192.png 4x" width="30" height="30" alt=""> <span class="brand__name">Clinqoo</span></a>' +
         '<button class="side__close" id="sideClose" aria-label="Tutup menu">' +
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 6l12 12M18 6 6 18"/></svg>' +
         '</button></div>' +

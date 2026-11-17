@@ -4,87 +4,93 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Pembayaran QRIS — QRIS.SITE</title>
+<title>Pembayaran QRIS — Clinqoo</title>
 <meta name="theme-color" content="#f7f4ee">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/checkout.css?v=3">
 </head>
-<body>
+<body class="co-body">
 
-<header class="nav is-stuck">
-  <div class="wrap nav__inner">
-    <a class="brand" href="/"><span class="brand__mark">Q</span> QRIS.SITE</a>
-    <nav class="nav__links">
-      <a href="/app/tagihan/">Buat tagihan</a>
-      <a href="/app/">Dashboard</a>
-      <a href="/docs/">Dokumentasi</a>
-    </nav>
-    <div class="nav__cta">
-      <a class="btn btn--sm" href="/app/tagihan/">Buat tagihan</a>
-    </div>
-  </div>
-</header>
+<div class="co-bar">
+  <a class="co-bar__brand" href="/"><img class="brand__logo" src="/assets/brand/icon-48.png" srcset="/assets/brand/icon-48.png 1x, /assets/brand/icon-192.png 4x" width="30" height="30" alt=""> <span class="brand__name">Clinqoo</span></a>
+  <span class="co-bar__note">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11H5v9h14zM8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    Pembayaran aman
+  </span>
+</div>
 
-<main class="wrap checkout">
-  <div id="loading" class="banner">Memuat tagihan…</div>
+<main class="co-wrap">
+  <div id="loading" class="banner" style="max-width:470px;margin:0 auto 18px">Memuat tagihan…</div>
+  <div id="errorBox" hidden class="banner banner--err" style="max-width:470px;margin:0 auto 18px"></div>
 
-  <div id="content" hidden>
-    <div class="checkout__grid">
-      <div class="checkout__qr">
-        <div class="status-label" id="statusLabel" style="margin-bottom:16px"><i></i> Menunggu pembayaran</div>
-        <img id="qrImg" alt="QRIS pembayaran" width="240" height="240">
-        <div class="checkout__amt" id="amount">Rp 0</div>
-        <div class="muted" style="font-size:12.5px;margin-top:6px" id="countdown">Berlaku 15 menit</div>
-        <div id="qrFallback" hidden style="margin-top:16px">
-          <p class="muted" style="font-size:12.5px">QR tidak dapat dimuat otomatis. Buka gambar QRIS di tab baru:</p>
-          <a class="btn btn--ghost btn--sm" id="qrLink" href="#" target="_blank" rel="noopener">Buka QRIS</a>
-        </div>
+  <section class="co" id="content" hidden>
+    <header class="co__head">
+      <span class="co__mark" id="merchantMark">Q</span>
+      <div class="co__who">
+        <b id="merchantName">Penjual</b>
+        <span id="title">Pembayaran QRIS</span>
       </div>
+      <div class="status-label status-label--wait" id="statusLabel"><i></i> Menunggu</div>
+    </header>
 
-      <div class="checkout__detail">
-        <h2 id="title">Pembayaran QRIS</h2>
-        <p class="muted" style="margin:0;font-size:13.5px" id="subtitle">Scan QR dengan aplikasi e-wallet atau mobile banking apa pun.</p>
-
-        <div class="kv">
-          <div class="kv__row"><span>Nomor tagihan</span><b class="mono" id="payId">—</b></div>
-          <div class="kv__row"><span>Referensi</span><b class="mono" id="payRef">—</b></div>
-          <div class="kv__row"><span>Nominal</span><b id="payAmount">—</b></div>
-          <div class="kv__row"><span>Biaya layanan 0,7%</span><b id="payFee">—</b></div>
-          <div class="kv__row"><span>Masuk ke penjual</span><b id="payNet" class="money" style="color:var(--money)">—</b></div>
-          <div class="kv__row"><span>Metode</span><b>QRIS</b></div>
-          <div class="kv__row"><span>Kedaluwarsa</span><b id="payExp">—</b></div>
-        </div>
-
-        <div class="checkout__steps">
-          <p><b>1.</b> Buka aplikasi e-wallet atau mobile banking pilihanmu.</p>
-          <p><b>2.</b> Pilih menu Scan QRIS, arahkan ke kode di samping.</p>
-          <p><b>3.</b> Periksa nominal, lalu konfirmasi pembayaran.</p>
-        </div>
-
-        <div id="demoArea" hidden style="margin-top:22px">
-          <button class="btn btn--money btn--block" id="simulateBtn" type="button">Simulasikan pembayaran berhasil</button>
-        </div>
-
-        <div id="paidBox" hidden style="margin-top:22px">
-          <div class="banner" style="border-color:var(--money)">Pembayaran diterima. Terima kasih sudah membayar tepat waktu.</div>
-        </div>
-
-        <div class="qrpage__actions" style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:22px">
-          <a class="btn btn--ghost btn--sm" id="bigQrLink" href="#" target="_blank" rel="noopener">QR besar</a>
-          <button class="btn btn--ghost btn--sm" id="sharePay" type="button">Bagikan</button>
-        </div>
-        <p style="margin-top:20px"><a class="link-u" href="/app/tagihan/">Buat tagihan lain</a></p>
-      </div>
+    <div class="co__amount">
+      <span>Total dibayar</span>
+      <b id="amount">Rp 0</b>
     </div>
-  </div>
 
-  <div id="errorBox" hidden class="banner banner--err"></div>
+    <div class="co__qr" id="qrBox"><img id="qrImg" alt="QRIS pembayaran" width="268" height="268"></div>
+    <div class="co__bar"><i id="bar"></i></div>
+    <p class="co__timer" id="countdown">Berlaku 15 menit</p>
+
+    <div class="co-fallback" id="qrFallback" hidden>
+      QR tidak dapat dimuat otomatis. <a id="qrLink" href="#" target="_blank" rel="noopener">Buka gambar QRIS</a>
+    </div>
+
+    <div class="co__rows">
+      <div class="co__row">
+        <span>Nomor tagihan</span>
+        <b class="mono" id="payId">—<button class="co__copy" id="copyId" type="button" aria-label="Salin nomor tagihan">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9h10v10H9zM5 15V5h10"/></svg>
+        </button></b>
+      </div>
+      <div class="co__row"><span>Biaya layanan</span><b id="payFee">—</b></div>
+      <div class="co__row"><span>Kedaluwarsa</span><b id="payExp">—</b></div>
+    </div>
+
+    <div class="co__steps" id="steps">
+      <p><b>1</b><span>Buka aplikasi e-wallet atau mobile banking apa pun.</span></p>
+      <p><b>2</b><span>Pilih menu Scan QRIS, lalu arahkan ke kode di atas.</span></p>
+      <p><b>3</b><span>Periksa nominal, konfirmasi. Status berubah sendiri di halaman ini.</span></p>
+    </div>
+
+    <div class="co__paid" id="paidBox" hidden style="margin-top:20px">
+      <b>Pembayaran diterima</b>
+      <span>Terima kasih. Dana sudah masuk ke penjual.</span>
+    </div>
+
+    <div class="co__demo" id="demoArea" hidden>
+      <p>Mode uji: belum ada uang yang berpindah.</p>
+      <button class="btn btn--ghost btn--sm btn--block" id="simulateBtn" type="button">Simulasikan pembayaran lunas</button>
+    </div>
+
+    <div class="co__foot">
+      <div class="co__actions">
+        <a class="btn btn--ghost btn--sm" id="saveQr" href="#" download="qris.png">Simpan QR</a>
+        <button class="btn btn--sm" id="sharePay" type="button">Bagikan</button>
+      </div>
+      <p class="co__other"><a id="bigQrLink" href="#" target="_blank" rel="noopener">Tampilkan QR lebih besar</a></p>
+      <p class="co__note">Halaman ini memperbarui status sendiri setiap beberapa detik. Tidak perlu unggah bukti bayar.</p>
+    </div>
+  </section>
 </main>
 
 <div class="toast" id="toast"></div>
-<script src="/js/bayar.js"></script>
+<script src="/js/bayar.js?v=3"></script>
 </body>
 </html>

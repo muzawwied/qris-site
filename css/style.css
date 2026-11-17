@@ -423,3 +423,8 @@ table.doc-table th { font-size: 10.5px; letter-spacing: .14em; text-transform: u
 @media (max-width: 760px) {
   .linkcards { grid-template-columns: 1fr; }
 }
+
+
+/* Logo Clinqoo */
+.brand__logo { width: 30px; height: 30px; border-radius: 50%; display: block; flex: none; }
+.brand__name { font-family: var(--serif); font-size: 22px; letter-spacing: -0.015em; line-height: 1; }
