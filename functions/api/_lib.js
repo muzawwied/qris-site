@@ -400,6 +400,7 @@ export function publicUser(u) {
     plan: u.plan || 'warung',
     merchant_id: u.merchant_id || null,
     store_slug: u.store_slug || null,
+    logo: u.logo || null,
     api_key: u.api_key || null,
     created_at: u.created_at,
   };
@@ -524,6 +525,11 @@ export async function ensureUsersStoreSlug(env) {
   if (slugEnsured) return;
   try {
     await env.DB.prepare('ALTER TABLE users ADD COLUMN store_slug TEXT').run();
+  } catch (e) {
+    /* sudah ada */
+  }
+  try {
+    await env.DB.prepare('ALTER TABLE users ADD COLUMN logo TEXT').run();
   } catch (e) {
     /* sudah ada */
   }

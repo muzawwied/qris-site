@@ -47,7 +47,7 @@
         '<a class="side__link" href="/docs/">' + icon('M8 9l-4 3 4 3M16 9l4 3-4 3') + '<span>Dokumentasi</span></a>' +
         '</nav>' +
         '<div class="side__foot">' +
-        '<div class="side__user"><b id="sideName">—</b><span id="sideEmail">—</span></div>' +
+        '<div class="side__user"><span class="side__avatar" id="sideAvatar"></span><b id="sideName">—</b><span id="sideEmail">—</span></div>' +
         '<button class="side__logout" id="sideLogout">' + icon('M15 17l5-5-5-5M20 12H9M12 4H5v16h7') + '<span>Keluar</span></button>' +
         '</div>';
       host.insertBefore(side, host.firstChild);
@@ -96,6 +96,12 @@
       var name = document.getElementById('sideName');
       var mail = document.getElementById('sideEmail');
       if (name) name.textContent = user.business_name || 'Usaha';
+      var av = document.getElementById('sideAvatar');
+      if (av) {
+        var initial = ((user.business_name || 'U').trim().charAt(0) || 'U').toUpperCase();
+        av.innerHTML = user.logo ? '<img alt="" src="' + user.logo + '">' : initial;
+        av.classList.toggle('has-photo', !!user.logo);
+      }
       if (mail) mail.textContent = user.email || '';
     }
   }

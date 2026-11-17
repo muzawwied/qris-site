@@ -30,6 +30,21 @@ export async function onRequestPost({ request, env }) {
     patch.store_slug = slug;
   }
 
+  if (body && body.logo !== undefined) {
+    const raw = String(body.logo || '').trim();
+    if (raw === '') {
+      patch.logo = null;
+    } else {
+      if (!/^data:image\/(png|jpeg|jpg|webp);base64,/.test(raw)) {
+        return json({ error: 'Format foto harus PNG atau JPG.' }, 400);
+      }
+      if (raw.length > 220000) {
+        return json({ error: 'Foto terlalu besar. Maksimal sekitar 150 KB.' }, 400);
+      }
+      patch.logo = raw;
+    }
+  }
+
   if (!Object.keys(patch).length) return json({ error: 'Tidak ada yang diubah.' }, 400);
 
   const keys = Object.keys(patch);

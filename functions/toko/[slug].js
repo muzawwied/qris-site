@@ -8,11 +8,13 @@ export async function onRequestGet({ request, env, params }) {
   let html = await res.text();
 
   let name = 'Toko';
+  let logo = '';
   try {
     const row = await env.DB.prepare(
-      'SELECT business_name FROM users WHERE store_slug = ? LIMIT 1'
+      'SELECT business_name, logo FROM users WHERE store_slug = ? LIMIT 1'
     ).bind(slug).first();
     if (row && row.business_name) name = row.business_name;
+    if (row && row.logo) logo = row.logo;
   } catch (e) {
     /* biarkan nama default */
   }
@@ -23,7 +25,9 @@ export async function onRequestGet({ request, env, params }) {
 
   html = html
     .replace(/__NAME__/g, esc(name))
-    .replace(/__INITIAL__/g, esc(name.trim().charAt(0).toUpperCase() || 'T'))
+    .replace(/__LOGO__/g, logo && /^data:image\//.test(logo)
+      ? '<img alt="" src="' + esc(logo) + '">'
+      : esc(name.trim().charAt(0).toUpperCase() || 'T'))
     .replace(/__SLUG__/g, esc(slug));
 
   return new Response(html, {

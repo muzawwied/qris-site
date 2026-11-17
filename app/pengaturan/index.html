@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/creds.css">
 </head>
 <body>
 <div class="shell" id="shell">
@@ -20,6 +21,15 @@
       <div class="panel">
         <div class="panel__head"><div><h2>Profil usaha</h2><p>Nama ini dipakai di riwayat dan notifikasi.</p></div></div>
         <form id="profileForm">
+          <div class="avatar-row">
+            <div class="avatar" id="avatarPreview"><span id="avatarInitial">K</span></div>
+            <div class="avatar-row__actions">
+              <label class="btn btn--ghost btn--sm" for="logoInput">Ganti foto</label>
+              <input id="logoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+              <button class="btn btn--ghost btn--sm" type="button" id="logoRemove">Hapus</button>
+              <p class="muted" style="font-size:12px;margin:6px 0 0">JPG atau PNG, otomatis diperkecil.</p>
+            </div>
+          </div>
           <div class="field"><label for="business">Nama usaha</label><input id="business" type="text" maxlength="80" required></div>
           <div class="field"><label for="email">Email</label><input id="email" type="email" disabled></div>
           <div class="field"><label for="slug">Link toko</label><input id="slug" type="text" maxlength="32" placeholder="nama-toko" autocomplete="off"></div>
@@ -60,5 +70,6 @@
 <script src="/js/app-shell.js"></script>
 <script src="/js/page-pengaturan.js?v=2"></script>
 <script src="/js/pengaturan-toko.js"></script>
+<script src="/js/pengaturan-foto.js"></script>
 </body>
 </html>

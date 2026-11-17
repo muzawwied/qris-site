@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .shop { max-width: 520px; margin: 0 auto; padding: 44px 22px 64px; }
+  .shop__mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .shop__mark.has-photo { overflow: hidden; }
   .shop__mark { width: 54px; height: 54px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-family: var(--serif); font-size: 24px; margin-bottom: 22px; }
   .shop h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 8vw, 46px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 10px; }
   .shop__lead { color: var(--muted); font-size: 15px; margin: 0 0 28px; max-width: 34ch; }
@@ -47,7 +49,7 @@
 </header>
 
 <main class="shop">
-  <div class="shop__mark" id="shopMark">__INITIAL__</div>
+  <div class="shop__mark" id="shopMark">__LOGO__</div>
   <h1 id="shopName">__NAME__</h1>
   <p class="shop__lead">Isi nominal yang mau dibayar, lalu pindai QRIS dengan aplikasi bank atau e-wallet apa pun.</p>
 
@@ -135,7 +137,9 @@
     .then(function (d) {
       if (d && d.business_name) {
         document.getElementById('shopName').textContent = d.business_name;
-        document.getElementById('shopMark').textContent = d.business_name.trim().charAt(0).toUpperCase();
+        var mark = document.getElementById('shopMark');
+        if (d.logo) { mark.innerHTML = '<img alt="" src="' + d.logo + '">'; mark.classList.add('has-photo'); }
+        else { mark.textContent = d.business_name.trim().charAt(0).toUpperCase(); }
         document.title = 'Bayar di ' + d.business_name + ' — QRIS';
       }
     })
