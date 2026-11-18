@@ -1,4 +1,4 @@
-import { ensureSchema, ensurePaymentsUserId, json, cors, readJson, isAdmin, nowIso, publicWithdrawal } from '../_lib.js';
+import { ensureSchema, ensurePaymentsUserId, json, cors, readJson, isAdmin, nowIso, publicWithdrawal, notifyWithdrawal, signWithdrawal } from '../_lib.js';
 
 export async function onRequestOptions() { return cors(); }
 
@@ -49,5 +49,14 @@ export async function onRequestPost({ request, env }) {
   await env.DB.prepare('UPDATE withdrawals SET status = ?, note = ?, updated_at = ?, processed_at = ? WHERE id = ?')
     .bind(status, note || null, ts, status === 'paid' ? ts : row.processed_at || null, id).run();
 
-  return json({ ok: true, id, status });
+  const fresh = await env.DB.prepare('SELECT * FROM withdrawals WHERE id = ?').bind(id).first();
+  await notifyWithdrawal(env, fresh, status);
+  const sig = await signWithdrawal(env, fresh);
+
+  return json({
+    ok: true,
+    id,
+    status,
+    signature: sig ? { short: sig.short, verify_url: sig.verify_url } : null,
+  });
 }

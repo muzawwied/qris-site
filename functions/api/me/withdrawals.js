@@ -1,6 +1,6 @@
 import {
   ensureSchema, ensurePaymentsUserId, json, cors, readJson, currentUser,
-  newId, nowIso, balanceOf, publicWithdrawal,
+  newId, nowIso, balanceOf, publicWithdrawal, notifyWithdrawal, signWithdrawal,
 } from '../_lib.js';
 
 export async function onRequestOptions() { return cors(); }
@@ -58,6 +58,16 @@ export async function onRequestPost({ request, env }) {
   ).bind(id, user.id, amount, bankName, accountNumber, accountName, ts, ts).run();
 
   const row = await env.DB.prepare('SELECT * FROM withdrawals WHERE id = ?').bind(id).first();
+  await notifyWithdrawal(env, row, 'pending');
+  const sig = await signWithdrawal(env, row);
   const newBalance = await balanceOf(env, user.id);
-  return json({ ok: true, withdrawal: publicWithdrawal(row), balance: newBalance }, 201);
+  return json(
+    {
+      ok: true,
+      withdrawal: publicWithdrawal(row),
+      balance: newBalance,
+      signature: sig ? { short: sig.short, verify_url: sig.verify_url } : null,
+    },
+    201
+  );
 }

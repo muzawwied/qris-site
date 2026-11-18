@@ -592,6 +592,78 @@ export async function verifyTurnstile(env, request, token) {
   }
 }
 
+
+
+// ===== Tanda tangan resmi pencairan (HMAC server) =====
+export function withdrawalCanonical(row) {
+  return [
+    'clinqoo-wd-v1',
+    String(row.id || ''),
+    String(row.user_id || ''),
+    String(Math.round(Number(row.amount) || 0)),
+    String(row.status || ''),
+    String(row.processed_at || ''),
+  ].join('|');
+}
+
+export async function signWithdrawal(env, row) {
+  const key = env.WITHDRAWAL_SIGNING_KEY;
+  if (!key) return null;
+  const full = await hmacHex(key, withdrawalCanonical(row));
+  return {
+    full,
+    short: full.slice(0, 16).toUpperCase().replace(/(.{4})(?=.)/g, '$1-'),
+    verify_url:
+      String(env.PUBLIC_BASE_URL || 'https://clinqoo.biz.id').replace(/\/+$/, '') +
+      '/verifikasi-penarikan/?id=' + encodeURIComponent(row.id) + '&sig=' + full,
+  };
+}
+
+export async function verifyWithdrawalSignature(env, row, sig) {
+  const key = env.WITHDRAWAL_SIGNING_KEY;
+  if (!key || !sig) return false;
+  const want = await hmacHex(key, withdrawalCanonical(row));
+  return safeEqual(want, String(sig).trim().toLowerCase());
+}
+
+const WD_LABEL = {
+  pending: 'Menunggu persetujuan',
+  approved: 'Disetujui, menunggu transfer',
+  paid: 'Sudah ditransfer',
+  rejected: 'Ditolak',
+};
+
+export async function notifyWithdrawal(env, row, stage) {
+  try {
+    const u = await env.DB.prepare('SELECT business_name, telegram_chat_id FROM users WHERE id = ? LIMIT 1')
+      .bind(row.user_id).first();
+    if (!u || !u.telegram_chat_id) return false;
+
+    const rp = (n) => 'Rp ' + Math.round(Number(n) || 0).toLocaleString('id-ID');
+    const sig = await signWithdrawal(env, row);
+    const acct = String(row.account_number || '');
+    const masked = acct.length > 4 ? '••••' + acct.slice(-4) : acct;
+
+    const lines = [
+      '<b>Pencairan ' + (WD_LABEL[stage] || WD_LABEL[row.status] || row.status) + '</b>',
+      rp(row.amount),
+      '',
+      'Tujuan: ' + (row.bank_name || '-') + ' ' + masked,
+      'Pengajuan: ' + row.id,
+    ];
+    if (row.processed_at && stage !== 'pending') {
+      lines.push('Waktu proses: ' + new Date(row.processed_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) + ' WIB');
+    }
+    if (sig) {
+      lines.push('', 'Tanda tangan: <code>' + sig.short + '</code>');
+      lines.push('Cek keaslian: ' + sig.verify_url);
+    }
+    return await sendTelegram(env, u.telegram_chat_id, lines.join('\n'));
+  } catch (e) {
+    return false;
+  }
+}
+
 // ===== AUTH: password, sesi, API key =====
 const PBKDF2_ITER = 100000; // batas Cloudflare Workers = 100.000 iterasi
 

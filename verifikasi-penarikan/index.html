@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Verifikasi tanda tangan — Clinqoo</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/app.css?v=3">
+<style>
+  .vf { max-width: 620px; margin: 0 auto; padding: 64px 22px 90px; }
+  .vf h1 { font-family: var(--serif); font-size: 34px; font-weight: 500; margin: 0 0 8px; }
+  .vf p.lead { color: var(--muted); font-size: 14px; margin: 0 0 26px; }
+  .vf__card { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 22px; }
+  .vf__row { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .vf__row:last-child { border-bottom: 0; }
+  .vf__row span { color: var(--muted); }
+  .vf__verdict { display: flex; align-items: center; gap: 9px; font-size: 14px; margin-bottom: 16px; }
+  .vf__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .vf__dot--ok { background: #2f6b3f; }
+  .vf__dot--bad { background: #8a2b2b; }
+  .vf code { font-size: 12px; word-break: break-all; color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="vf">
+  <h1>Verifikasi tanda tangan</h1>
+  <p class="lead">Halaman ini memeriksa apakah catatan pencairan yang kamu terima memang diterbitkan Clinqoo dan tidak diubah.</p>
+  <div class="vf__card">
+    <div class="vf__verdict"><i class="vf__dot" id="dot"></i><span id="verdict">Memeriksa…</span></div>
+    <div id="body"></div>
+    <div id="sigBox" style="margin-top:16px" hidden>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Tanda tangan yang dikirim</div>
+      <code id="sigText"></code>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var id = q.get('id') || '';
+  var sig = q.get('sig') || '';
+  var fmt = function (n) { return 'Rp ' + Math.round(Number(n) || 0).toLocaleString('id-ID'); };
+  var badge = { pending: 'Menunggu persetujuan', approved: 'Disetujui', paid: 'Sudah ditransfer', rejected: 'Ditolak' };
+
+  document.getElementById('sigText').textContent = sig || '(kosong)';
+  document.getElementById('sigBox').hidden = !sig;
+
+  if (!id) {
+    document.getElementById('verdict').textContent = 'Tautan tidak lengkap, nomor pengajuan tidak ada.';
+    document.getElementById('dot').className = 'vf__dot vf__dot--bad';
+    return;
+  }
+
+  fetch('/api/penarikan/verifikasi?id=' + encodeURIComponent(id) + '&sig=' + encodeURIComponent(sig))
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var dot = document.getElementById('dot');
+      var verdict = document.getElementById('verdict');
+      if (d.error) {
+        dot.className = 'vf__dot vf__dot--bad';
+        verdict.textContent = d.error;
+        return;
+      }
+      dot.className = 'vf__dot ' + (d.valid ? 'vf__dot--ok' : 'vf__dot--bad');
+      verdict.textContent = d.valid ? 'Tanda tangan sah, catatan asli Clinqoo.' : 'Tanda tangan tidak cocok.';
+
+      var rows = [
+        ['Nomor pengajuan', d.id],
+        ['Nominal', fmt(d.amount)],
+        ['Status', badge[d.status] || d.status],
+        ['Tujuan', d.destination],
+        ['Diajukan', d.created_at ? new Date(d.created_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) + ' WIB' : '—'],
+        ['Diproses', d.processed_at ? new Date(d.processed_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) + ' WIB' : '—']
+      ];
+      var html = rows.map(function (r) {
+        return '<div class="vf__row"><span>' + r[0] + '</span><b>' + String(r[1]) + '</b></div>';
+      }).join('');
+      html += '<div class="vf__row"><span>Keterangan</span><b style="font-weight:400;text-align:right">' + d.note + '</b></div>';
+      document.getElementById('body').innerHTML = html;
+    })
+    .catch(function () {
+      document.getElementById('dot').className = 'vf__dot vf__dot--bad';
+      document.getElementById('verdict').textContent = 'Gagal memeriksa. Coba muat ulang.';
+    });
+})();
+</script>
+</body>
+</html>
