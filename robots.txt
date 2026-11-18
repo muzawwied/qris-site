@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
-Disallow: /dashboard.html
-Disallow: /bayar.html
+Disallow: /app/
+Disallow: /api/
+Disallow: /onboarding/
+Disallow: /daftar/
+Disallow: /verifikasi/
+
+Sitemap: https://clinqoo.biz.id/sitemap.xml

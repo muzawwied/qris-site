@@ -10,6 +10,9 @@ export async function onRequestPost({ request, env }) {
   await ensureUsersVerified(env);
 
   const body = await readJson(request);
+
+  const captcha = await verifyTurnstile(env, request, body.turnstile_token);
+  if (!captcha.ok) return json({ error: captcha.error }, 403);
   const email = String((body && body.email) || '').trim().toLowerCase();
   const generic = { ok: true, message: 'Kalau email itu terdaftar dan belum aktif, tautan aktivasi baru sudah dibuat.' };
   if (!email || !email.includes('@')) return json({ error: 'Email tidak valid.' }, 400);

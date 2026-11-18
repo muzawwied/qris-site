@@ -52,16 +52,20 @@
 <script>
 (function () {
   var $ = function (s) { return document.querySelector(s); };
-  var tsWidget = null;
   fetch('/api/config').then(function (r) { return r.json(); }).then(function (d) {
     var key = d && d.turnstile_site_key;
     if (!key) return;
     var slot = document.getElementById('turnstileSlot');
+    if (!slot) return;
     slot.hidden = false;
+    var box = document.createElement('div');
+    box.className = 'cf-turnstile';
+    box.setAttribute('data-sitekey', key);
+    box.setAttribute('data-theme', 'light');
+    slot.appendChild(box);
     var sc = document.createElement('script');
-    sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-    sc.async = true;
-    sc.onload = function () { if (window.turnstile) tsWidget = window.turnstile.render(slot, { sitekey: key, theme: 'light' }); };
+    sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    sc.async = true; sc.defer = true;
     document.head.appendChild(sc);
   }).catch(function () {});
 
@@ -73,8 +77,8 @@
       method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: $('#email').value, turnstile_token: (function () {
-        try { return tsWidget !== null && window.turnstile ? window.turnstile.getResponse(tsWidget) : ''; }
-        catch (e) { return ''; }
+        var el = document.querySelector('[name="cf-turnstile-response"]');
+        return el ? String(el.value || '') : '';
       })() })
     })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })

@@ -8,9 +8,9 @@
 <meta property="og:site_name" content="Clinqoo">
 <meta property="og:title" content="Dokumentasi API — Clinqoo">
 <meta property="og:description" content="Buat tagihan QRIS lewat API, terima konfirmasi lewat webhook bertanda tangan.">
-<meta property="og:url" content="https://qris-site.pages.dev/docs/">
-<meta property="og:image" content="https://qris-site.pages.dev/assets/brand/og.jpg">
-<meta property="og:image:secure_url" content="https://qris-site.pages.dev/assets/brand/og.jpg">
+<meta property="og:url" content="https://clinqoo.biz.id/docs/">
+<meta property="og:image" content="https://clinqoo.biz.id/assets/brand/og.jpg">
+<meta property="og:image:secure_url" content="https://clinqoo.biz.id/assets/brand/og.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -18,7 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Dokumentasi API — Clinqoo">
 <meta name="twitter:description" content="Buat tagihan QRIS lewat API, terima konfirmasi lewat webhook bertanda tangan.">
-<meta name="twitter:image" content="https://qris-site.pages.dev/assets/brand/og.jpg">
+<meta name="twitter:image" content="https://clinqoo.biz.id/assets/brand/og.jpg">
 <meta name="description" content="Dokumentasi API Clinqoo: buat tagihan QRIS, cek status pembayaran, dan terima webhook bertanda tangan.">
 <meta name="theme-color" content="#f7f4ee">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -63,7 +63,7 @@
 
     <h2 id="ringkas">Ringkasan</h2>
     <p>Semua permintaan memakai JSON melalui HTTPS. Base URL mengikuti domain yang sedang dipakai:</p>
-    <pre id="baseUrl">https://qris-site.pages.dev</pre>
+    <pre id="baseUrl">https://clinqoo.biz.id</pre>
     <p>Respons selalu JSON. Kode status yang dipakai: <code>200</code> sukses, <code>400</code> input salah, <code>401</code> token tidak valid, <code>404</code> tidak ditemukan, <code>502</code> provider menolak.</p>
 
     <h2 id="buat">Buat tagihan</h2>
@@ -80,7 +80,7 @@
       </tbody>
     </table>
 
-    <pre>curl -X POST https://qris-site.pages.dev/api/pay \
+    <pre>curl -X POST https://clinqoo.biz.id/api/pay \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 150000,
@@ -99,14 +99,14 @@
   "qr_string": "0002010102122667...",
   "qr_image": "https://api.qrserver.com/v1/create-qr-code/?...",
   "expires_at": "2026-11-17T14:00:00.000Z",
-  "checkout_url": "https://qris-site.pages.dev/bayar/pay_m3k9a1f2b7c4"
+  "checkout_url": "https://clinqoo.biz.id/bayar/pay_m3k9a1f2b7c4"
 }</pre>
 
     <p>Bagikan <code>checkout_url</code> ke pembeli, atau render <code>qr_image</code> sendiri di halaman tokomu. Tagihan berlaku 15 menit.</p>
 
     <h2 id="status">Cek status</h2>
     <p><code>GET /api/pay/{id}</code> — bisa memakai id tagihan atau referensi. Aman dipanggil berkala (polling).</p>
-    <pre>curl https://qris-site.pages.dev/api/pay/pay_m3k9a1f2b7c4</pre>
+    <pre>curl https://clinqoo.biz.id/api/pay/pay_m3k9a1f2b7c4</pre>
     <p>Nilai <code>status</code>: <code>pending</code>, <code>paid</code>, <code>expired</code>, <code>failed</code>.</p>
     <p><code>GET /api/pay?limit=10</code> mengembalikan daftar tagihan terbaru (ringkas, tanpa data pembeli) — berguna untuk menampilkan bukti aktivitas.</p>
 
@@ -136,7 +136,7 @@ if (req.headers['x-signature'] !== expected) {
 }</pre>
     <p>Alternatif sederhana: kirim secret yang sama pada header <code>X-Webhook-Token</code>.</p>
 
-    <h2 id="penarikan">Penarikan</h2><p>Pencairan saldo tidak otomatis: pengguna mengajukan lewat <code>POST /api/me/withdrawals</code>, lalu admin memprosesnya. Saldo tersedia = total net transaksi lunas − pengajuan yang masih berjalan.</p><pre>curl -X POST https://qris-site.pages.dev/api/me/withdrawals \
+    <h2 id="penarikan">Penarikan</h2><p>Pencairan saldo tidak otomatis: pengguna mengajukan lewat <code>POST /api/me/withdrawals</code>, lalu admin memprosesnya. Saldo tersedia = total net transaksi lunas − pengajuan yang masih berjalan.</p><pre>curl -X POST https://clinqoo.biz.id/api/me/withdrawals \
   -H "Content-Type: application/json" \
   -H "Cookie: qris_session=..." \
   -d '{"amount":50000,"bank_name":"BCA","account_number":"1234567890","account_name":"Nama Pemilik"}'</pre><h2 id="admin">Endpoint admin</h2>
@@ -149,7 +149,7 @@ if (req.headers['x-signature'] !== expected) {
         <tr><td><code>POST /api/demo-pay</code></td><td>Menandai tagihan lunas untuk pengujian (mode demo, atau admin token).</td></tr>
       </tbody>
     </table>
-    <pre>curl https://qris-site.pages.dev/api/payments?status=paid&amp;limit=20 \
+    <pre>curl https://clinqoo.biz.id/api/payments?status=paid&amp;limit=20 \
   -H "Authorization: Bearer $ADMIN_TOKEN"</pre>
 
     <h2 id="kredensial">Kredensial</h2>
@@ -165,7 +165,7 @@ if (req.headers['x-signature'] !== expected) {
 
     <h2 id="contoh">Contoh kode</h2>
     <p>Membuat tagihan dari server Node, lalu menunggu status lunas:</p>
-    <pre>const base = 'https://qris-site.pages.dev';
+    <pre>const base = 'https://clinqoo.biz.id';
 
 const res = await fetch(base + '/api/pay', {
   method: 'POST',

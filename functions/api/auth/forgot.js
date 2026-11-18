@@ -1,4 +1,4 @@
-import { rateLimit, tooMany, clientIp, sameOrigin,
+import { rateLimit, tooMany, clientIp, sameOrigin, verifyTurnstile,
   ensureSchema, json, cors, readJson, mode, nowIso, randomToken, sha256Hex, logEvent,
 } from '../_lib.js';
 
@@ -15,6 +15,9 @@ export async function onRequestPost({ request, env }) {
   if (!lim.ok) return tooMany(lim.retry_after);
 
   const body = await readJson(request);
+
+  const captcha = await verifyTurnstile(env, request, body.turnstile_token);
+  if (!captcha.ok) return json({ error: captcha.error }, 403);
   if (!body) return json({ error: 'Body harus JSON.' }, 400);
 
   const email = String(body.email || '').trim().toLowerCase();
