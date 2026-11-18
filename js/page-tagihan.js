@@ -11,19 +11,40 @@
   }
 
   var amount = $('#amount');
+  var netMode = $('#netMode');
+  var rate = 0.02;
+  fetch('/api/config').then(function (r) { return r.json(); }).then(function (d) {
+    if (d && Number(d.fee_rate) > 0) { rate = Number(d.fee_rate); paint(); }
+  }).catch(function () {});
+
+  function grossOf(net) { return Math.ceil(net / (1 - rate)); }
+
+  function paint() {
+    var on = netMode.checked;
+    $('#amountLabel').textContent = on ? 'Dana yang mau diterima (Rp)' : 'Nominal tagihan (Rp)';
+    if (!on) {
+      $('#amountHint').textContent = 'Minimal Rp 1.000 · maksimal Rp 100.000.000';
+      return;
+    }
+    var v = Number(amount.value || 0);
+    $('#amountHint').textContent = v >= 1000
+      ? 'Pembeli membayar sekitar ' + fmt(grossOf(v) + 100) + ' termasuk kode unik. Kamu terima ' + fmt(v) + '.'
+      : 'Isi dana bersih yang ingin kamu terima.';
+  }
   var chips = document.querySelectorAll('#quickAmounts .chip');
   function sync() {
     var v = Number(amount.value || 0);
     chips.forEach(function (c) { c.classList.toggle('is-active', Number(c.getAttribute('data-amount')) === v); });
   }
   chips.forEach(function (c) { c.addEventListener('click', function () { amount.value = c.getAttribute('data-amount'); sync(); }); });
-  amount.addEventListener('input', sync);
+  amount.addEventListener('input', function () { sync(); paint(); });
+  netMode.addEventListener('change', paint);
 
   $('#createForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var amt = Number(amount.value || 0);
     var msg = $('#msg');
-    if (!amt || amt < 1000) { msg.hidden = false; msg.textContent = 'Nominal minimal Rp 1.000.'; return; }
+    if (!amt || amt < 1000) { msg.hidden = false; msg.textContent = netMode.checked ? 'Dana bersih minimal Rp 1.000.' : 'Nominal minimal Rp 1.000.'; return; }
     if (amt > 100000000) { msg.hidden = false; msg.textContent = 'Nominal maksimal Rp 100.000.000.'; return; }
     msg.hidden = true;
 
@@ -34,6 +55,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amount: amt,
+        net: netMode.checked,
         description: $('#description').value,
         reference: $('#reference').value,
         buyer_name: $('#buyerName').value

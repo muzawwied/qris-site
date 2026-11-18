@@ -31,15 +31,21 @@ export async function onRequestPost({ request, env }) {
   const body = await readJson(request);
   if (!body) return json({ error: 'Body harus JSON.' }, 400);
 
-  const amount = Math.round(Number(body.amount || 0));
-  if (!Number.isFinite(amount) || amount < 1000) {
+  const requested = Math.round(Number(body.amount || 0));
+  if (!Number.isFinite(requested) || requested < 1000) {
     return json({ error: 'Nominal minimal Rp 1.000.' }, 400);
   }
+
+  // Mode "terima bersih": angka yang diisi adalah dana yang ingin diterima,
+  // nominal tagihan dibulatkan ke atas supaya setelah biaya provider hasilnya pas.
+  const feeRateNow = Number(env.FEE_RATE || 0.02);
+  const wantsNet = body.net === true || body.net === 'true' || body.net === 1;
+  const amount = wantsNet ? Math.ceil(requested / (1 - feeRateNow)) : requested;
   if (amount > 100000000) {
     return json({ error: 'Nominal melebihi batas Rp 100.000.000 per transaksi.' }, 400);
   }
 
-  const feeRate = Number(env.FEE_RATE || 0.007);
+  const feeRate = Number(env.FEE_RATE || 0.02);
   const fee = feeFor(amount, feeRate);
   const id = newId('pay');
   const ts = nowIso();
@@ -110,6 +116,8 @@ export async function onRequestPost({ request, env }) {
     amount: billAmount,
     fee: billFee,
     net_amount: billNet,
+    requested_amount: requested,
+    net_mode: wantsNet,
     unique_code: q.ok && q.bill ? q.bill.unique_code : 0,
     status: 'pending',
     description: body.description || null,
