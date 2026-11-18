@@ -38,9 +38,32 @@
   $('#tabLogin').addEventListener('click', function () { setTab('login'); });
   $('#tabRegister').addEventListener('click', function () { setTab('register'); });
 
+  var tsWidget = null;
+  fetch('/api/config').then(function (r) { return r.json(); }).then(function (d) {
+    var key = d && d.turnstile_site_key;
+    if (!key) return;
+    var slot = $('#turnstileSlot');
+    slot.hidden = false;
+    var sc = document.createElement('script');
+    sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    sc.async = true;
+    sc.onload = function () {
+      if (!window.turnstile) return;
+      tsWidget = window.turnstile.render(slot, { sitekey: key, theme: 'light', size: 'normal' });
+    };
+    document.head.appendChild(sc);
+  }).catch(function () {});
+
+  function captchaToken() {
+    try { return tsWidget !== null ? window.turnstile.getResponse(tsWidget) : ''; }
+    catch (e) { return ''; }
+  }
+
   $('#authForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var payload = { email: $('#email').value, password: $('#password').value };
+    var tok = captchaToken();
+    if (tok) payload.turnstile_token = tok;
 
     var btn = $('#authBtn');
     btn.disabled = true;
@@ -70,6 +93,7 @@
         var m = $('#authMsg');
         m.hidden = false;
         m.textContent = err.message;
+        try { if (tsWidget !== null && window.turnstile) window.turnstile.reset(tsWidget); } catch (e) {}
         btn.disabled = false;
         btn.textContent = tab === 'register' ? 'Buat akun' : 'Masuk';
       });

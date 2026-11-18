@@ -1,6 +1,7 @@
 import {
   ensureSchema, ensurePaymentsUserId, json, cors, readJson, mode, newId, nowIso, feeFor,
   createQris, logEvent, publicPayment, qrImageUrl, ownerFromRequest, ensureUsersMerchantId, ensurePaymentsProviderId,
+  rateLimit, tooMany, clientIp,
 } from './_lib.js';
 
 export async function onRequestOptions() {
@@ -26,6 +27,15 @@ export async function onRequestPost({ request, env }) {
       return json({ error: e.message }, 401);
     }
     owner = null;
+  }
+
+  // Mode live: setiap tagihan harus milik akun, supaya tidak ada pembuatan massal tanpa jejak.
+  if (mode(env) === 'live' && !owner) {
+    return json({ error: 'Silakan masuk atau pakai API key untuk membuat tagihan.' }, 401);
+  }
+  if (owner) {
+    const lim = await rateLimit(env, 'pay:user:' + owner.id, 60, 600);
+    if (!lim.ok) return tooMany(lim.retry_after);
   }
 
   const body = await readJson(request);

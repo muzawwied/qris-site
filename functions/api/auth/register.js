@@ -1,6 +1,7 @@
 import {
   ensureSchema, ensurePaymentsUserId, ensureUsersMerchantId, ensureUsersVerified, newMerchantId,
   json, cors, readJson, nowIso, newId, randomToken, hashPassword, sha256Hex, logEvent, sendVerifyEmail,
+  rateLimit, tooMany, clientIp, verifyTurnstile, sameOrigin,
 } from '../_lib.js';
 
 export async function onRequestOptions() { return cors(); }
@@ -13,8 +14,17 @@ export async function onRequestPost({ request, env }) {
   await ensureUsersMerchantId(env);
   await ensureUsersVerified(env);
 
+  if (!sameOrigin(request)) return json({ error: 'Permintaan ditolak.' }, 403);
+
+  const ip = clientIp(request);
+  const limIp = await rateLimit(env, 'register:ip:' + ip, 6, 3600);
+  if (!limIp.ok) return tooMany(limIp.retry_after);
+
   const body = await readJson(request);
   if (!body) return json({ error: 'Body harus JSON.' }, 400);
+
+  const captcha = await verifyTurnstile(env, request, body.turnstile_token);
+  if (!captcha.ok) return json({ error: captcha.error }, 403);
 
   const email = String(body.email || '').trim().toLowerCase();
   const password = String(body.password || '');

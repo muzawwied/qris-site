@@ -1,4 +1,4 @@
-import {
+import { rateLimit, tooMany, clientIp, sameOrigin,
   ensureSchema, json, cors, readJson, mode, nowIso, randomToken, sha256Hex, logEvent,
 } from '../_lib.js';
 
@@ -7,7 +7,12 @@ export async function onRequestOptions() { return cors(); }
 // POST /api/auth/forgot { email }
 // Selalu balas 200 supaya tidak bisa dipakai menebak email terdaftar.
 export async function onRequestPost({ request, env }) {
+  if (!sameOrigin(request)) return new Response(null, { status: 403 });
   await ensureSchema(env);
+
+  const ip = clientIp(request);
+  const lim = await rateLimit(env, 'forgot:ip:' + ip, 10, 3600);
+  if (!lim.ok) return tooMany(lim.retry_after);
 
   const body = await readJson(request);
   if (!body) return json({ error: 'Body harus JSON.' }, 400);

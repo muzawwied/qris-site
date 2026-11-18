@@ -499,6 +499,99 @@ export async function markPaid(env, row, info = {}) {
 }
 
 
+
+
+// ===== Keamanan: pembatas laju, asal permintaan, Turnstile =====
+let rateReady = false;
+export async function ensureRateTable(env) {
+  if (rateReady) return;
+  try {
+    await env.DB.prepare(
+      'CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, reset_at INTEGER NOT NULL)'
+    ).run();
+  } catch (e) { /* ada */ }
+  rateReady = true;
+}
+
+export function clientIp(request) {
+  return (
+    request.headers.get('cf-connecting-ip') ||
+    request.headers.get('x-real-ip') ||
+    (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() ||
+    'unknown'
+  );
+}
+
+// Mengembalikan { ok, retry_after } tanpa pernah melempar error ke pemanggil.
+export async function rateLimit(env, key, limit, windowSec) {
+  try {
+    await ensureRateTable(env);
+    const now = Date.now();
+    const reset = now + windowSec * 1000;
+    const row = await env.DB.prepare(
+      `INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?)
+       ON CONFLICT(key) DO UPDATE SET
+         count = CASE WHEN reset_at <= ? THEN 1 ELSE count + 1 END,
+         reset_at = CASE WHEN reset_at <= ? THEN ? ELSE reset_at END
+       RETURNING count, reset_at`
+    ).bind(key, reset, now, now, reset).first();
+    if (Math.random() < 0.02) {
+      try { await env.DB.prepare('DELETE FROM rate_limits WHERE reset_at < ?').bind(now).run(); } catch (e) { /* abaikan */ }
+    }
+    const count = Number((row && row.count) || 1);
+    const resetAt = Number((row && row.reset_at) || reset);
+    return { ok: count <= limit, count, retry_after: Math.max(1, Math.ceil((resetAt - now) / 1000)) };
+  } catch (e) {
+    return { ok: true, count: 0, retry_after: 0 };
+  }
+}
+
+export function tooMany(retry) {
+  return json(
+    { error: 'Terlalu banyak percobaan. Coba lagi dalam ' + retry + ' detik.' },
+    429,
+    { 'Retry-After': String(retry) }
+  );
+}
+
+// Permintaan POST yang membawa cookie sesi harus berasal dari situs ini sendiri.
+export function sameOrigin(request) {
+  const origin = request.headers.get('origin');
+  if (!origin) return true;
+  try {
+    return new URL(origin).host === new URL(request.url).host;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function hasSessionCookie(request) {
+  return String(request.headers.get('cookie') || '').includes('qris_session=');
+}
+
+export async function verifyTurnstile(env, request, token) {
+  const secret = env.TURNSTILE_SECRET_KEY;
+  if (!secret) return { ok: true, skipped: true };
+  const value = String(token || '').trim();
+  if (!value) return { ok: false, error: 'Verifikasi keamanan belum selesai. Muat ulang halaman lalu coba lagi.' };
+  try {
+    const form = new URLSearchParams();
+    form.set('secret', secret);
+    form.set('response', value);
+    form.set('remoteip', clientIp(request));
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: form.toString(),
+    });
+    const data = await res.json();
+    if (data && data.success) return { ok: true };
+    return { ok: false, error: 'Verifikasi keamanan gagal. Coba lagi.' };
+  } catch (e) {
+    return { ok: false, error: 'Verifikasi keamanan tidak dapat diperiksa.' };
+  }
+}
+
 // ===== AUTH: password, sesi, API key =====
 const PBKDF2_ITER = 100000; // batas Cloudflare Workers = 100.000 iterasi
 

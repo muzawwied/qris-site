@@ -34,6 +34,7 @@
           <label for="email">Email</label>
           <input id="email" type="email" autocomplete="email" placeholder="kamu@usaha.id" required>
         </div>
+        <div id="turnstileSlot" hidden style="margin:0 0 14px"></div>
         <div id="forgotMsg" class="banner banner--err" hidden></div>
         <button class="btn btn--block" type="submit" id="forgotBtn">Kirim tautan</button>
       </form>
@@ -51,6 +52,19 @@
 <script>
 (function () {
   var $ = function (s) { return document.querySelector(s); };
+  var tsWidget = null;
+  fetch('/api/config').then(function (r) { return r.json(); }).then(function (d) {
+    var key = d && d.turnstile_site_key;
+    if (!key) return;
+    var slot = document.getElementById('turnstileSlot');
+    slot.hidden = false;
+    var sc = document.createElement('script');
+    sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    sc.async = true;
+    sc.onload = function () { if (window.turnstile) tsWidget = window.turnstile.render(slot, { sitekey: key, theme: 'light' }); };
+    document.head.appendChild(sc);
+  }).catch(function () {});
+
   $('#forgotForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var btn = $('#forgotBtn'), msg = $('#forgotMsg');
@@ -58,7 +72,10 @@
     fetch('/api/auth/forgot', {
       method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: $('#email').value })
+      body: JSON.stringify({ email: $('#email').value, turnstile_token: (function () {
+        try { return tsWidget !== null && window.turnstile ? window.turnstile.getResponse(tsWidget) : ''; }
+        catch (e) { return ''; }
+      })() })
     })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
