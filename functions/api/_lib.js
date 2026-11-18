@@ -283,16 +283,16 @@ async function bqPost(env, params) {
       body: body.toString(),
     });
   } catch (e) {
-    return { ok: false, error: 'Gagal menghubungi BuatQris: ' + (e && e.message ? e.message : String(e)) };
+    return { ok: false, error: 'Penyedia pembayaran tidak dapat dihubungi.' };
   }
   const text = await res.text();
   let data = {};
   try { data = JSON.parse(text); } catch (e) {
-    return { ok: false, error: 'Respons BuatQris bukan JSON (HTTP ' + res.status + ').' };
+    return { ok: false, error: 'Penyedia pembayaran mengirim respons tak dikenal (HTTP ' + res.status + ').' };
   }
   if (!res.ok || data.success === false) {
     const msg = data.message || data.error || ('HTTP ' + res.status);
-    return { ok: false, error: 'BuatQris menolak: ' + msg, raw: data };
+    return { ok: false, error: 'Penyedia pembayaran menolak permintaan.', raw: data };
   }
   return { ok: true, data: data.data || data };
 }
@@ -310,7 +310,7 @@ export async function createBuatQris(env, payment, opts = {}) {
   if (!r.ok) return r;
   const d = r.data || {};
   const qrImage = d.qris_image || d.qr_url || d.qr_url_png || null;
-  if (!qrImage) return { ok: false, error: 'BuatQris tidak mengirim gambar QR.', raw: d };
+  if (!qrImage) return { ok: false, error: 'Penyedia pembayaran tidak mengirim gambar QR.', raw: d };
   return {
     ok: true,
     demo: false,

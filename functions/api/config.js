@@ -5,7 +5,7 @@ export async function onRequestGet({ env }) {
     mode: mode(env),
     fee_rate: Number(env.FEE_RATE || 0.02),
     currency: 'IDR',
-    provider: String(env.QRIS_PROVIDER || 'buatqris'),
+    provider: 'clinqoo',
     max_amount: 100000000,
     min_amount: 1000,
     expires_minutes: 30,

@@ -99,7 +99,7 @@ export async function onRequestPost({ request, env }) {
   if (!q.ok) {
     return json(
       {
-        error: q.error || 'Gagal membuat QRIS.',
+        error: 'Gagal membuat QRIS. Coba lagi beberapa saat lagi.',
         id,
         reference,
         amount,
@@ -122,12 +122,11 @@ export async function onRequestPost({ request, env }) {
     status: 'pending',
     description: body.description || null,
     mode: mode(env),
-    provider: q.provider || (mode(env) === 'live' ? 'generic' : 'demo'),
+    provider: mode(env) === 'live' ? 'qris' : 'demo',
     provider_id: q.provider_id || null,
     qr_string: q.qr_string || null,
     qr_image: qrImage,
     expires_at: providerExpiry,
-    provider_payment_url: q.ok && q.bill ? q.bill.payment_url : null,
     checkout_url: `${new URL(request.url).origin}/bayar/${id}`,
   });
 }
