@@ -190,9 +190,18 @@ export function safeEqual(a, b) {
 // Semua nama env bisa diatur supaya cocok dengan dokumentasi provider yang dipakai:
 //   QRIS_API_BASE, QRIS_API_KEY, QRIS_MERCHANT_ID, QRIS_CREATE_PATH, QRIS_STATUS_PATH
 // Bentuk respons provider berbeda-beda, jadi pembacaan field dibuat fleksibel.
-export async function createQris(env, payment) {
+export async function createQris(env, payment, opts = {}) {
   if (mode(env) !== 'live') {
     return { ok: true, demo: true, qr_string: demoQrString(payment), qr_image: null, provider_id: null };
+  }
+
+  const provider = String(env.QRIS_PROVIDER || (String(env.QRIS_API_BASE || '').includes('buatqris') ? 'buatqris' : 'generic')).toLowerCase();
+  if (provider === 'buatqris') {
+    return createBuatQris(env, payment, {
+      umkm_name: (opts && opts.umkm_name) || env.QRIS_UMKM_NAME || '',
+      callback_url: env.PUBLIC_BASE_URL ? String(env.PUBLIC_BASE_URL).replace(/\/+$/, '') + '/api/buatqris/callback' : undefined,
+      test: String(env.QRIS_SANDBOX || '') === '1',
+    });
   }
 
   const base = String(env.QRIS_API_BASE || 'https://api.qris.site').replace(/\/+$/, '');
@@ -248,6 +257,108 @@ export async function createQris(env, payment) {
     return { ok: false, error: 'Respons provider tidak berisi QR (qr_string/qr_image).' };
   }
   return { ok: true, demo: false, qr_string: qrString || null, qr_image: qrImage || null, provider_id: providerId, raw: data };
+}
+
+
+// ===== Adapter BuatQris (api.buatqris.site) =====
+// Semua request POST form-urlencoded dengan parameter action.
+const BQ_DEFAULT_BASE = 'https://api.buatqris.site';
+
+function bqBase(env) {
+  return String(env.QRIS_API_BASE || BQ_DEFAULT_BASE).replace(/\/+$/, '');
+}
+
+async function bqPost(env, params) {
+  const body = new URLSearchParams();
+  body.set('account_id', String(env.QRIS_MERCHANT_ID || ''));
+  body.set('secret_token', String(env.QRIS_API_KEY || ''));
+  Object.keys(params).forEach((k) => {
+    if (params[k] !== undefined && params[k] !== null && params[k] !== '') body.set(k, String(params[k]));
+  });
+  let res;
+  try {
+    res = await fetch(bqBase(env), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+  } catch (e) {
+    return { ok: false, error: 'Gagal menghubungi BuatQris: ' + (e && e.message ? e.message : String(e)) };
+  }
+  const text = await res.text();
+  let data = {};
+  try { data = JSON.parse(text); } catch (e) {
+    return { ok: false, error: 'Respons BuatQris bukan JSON (HTTP ' + res.status + ').' };
+  }
+  if (!res.ok || data.success === false) {
+    const msg = data.message || data.error || ('HTTP ' + res.status);
+    return { ok: false, error: 'BuatQris menolak: ' + msg, raw: data };
+  }
+  return { ok: true, data: data.data || data };
+}
+
+export async function createBuatQris(env, payment, opts = {}) {
+  const umkm = String(opts.umkm_name || '').slice(0, 15) || undefined;
+  const r = await bqPost(env, {
+    action: 'api_create_qris',
+    amount: payment.amount,
+    description: payment.description || 'Pembayaran QRIS',
+    umkm_name: umkm,
+    callback_url: opts.callback_url,
+    test: opts.test ? 1 : undefined,
+  });
+  if (!r.ok) return r;
+  const d = r.data || {};
+  const qrImage = d.qris_image || d.qr_url || d.qr_url_png || null;
+  if (!qrImage) return { ok: false, error: 'BuatQris tidak mengirim gambar QR.', raw: d };
+  return {
+    ok: true,
+    demo: false,
+    provider: 'buatqris',
+    qr_string: d.qris_string || null,
+    qr_image: qrImage,
+    provider_id: d.transaction_id || null,
+    bill: {
+      total_amount: Number(d.total_amount || payment.amount),
+      fee: Number(d.admin_fee || 0),
+      net: Number(d.credit_amount || 0),
+      unique_code: Number(d.amount_uniq || 0),
+      method: d.qris_method || null,
+      expires_at: d.expired_at || null,
+      payment_url: d.payment_url || null,
+    },
+    raw: d,
+  };
+}
+
+export async function checkBuatQris(env, transactionId) {
+  const r = await bqPost(env, { action: 'api_check_status', transaction_id: transactionId });
+  if (!r.ok) return r;
+  const d = r.data || {};
+  const raw = String(d.status || '').toLowerCase();
+  const status = ['success', 'settlement', 'paid', 'lunas'].includes(raw) ? 'paid'
+    : ['expired', 'kadaluarsa'].includes(raw) ? 'expired'
+    : ['failed', 'gagal', 'cancel', 'cancelled'].includes(raw) ? 'failed'
+    : 'pending';
+  return { ok: true, status, raw, data: d };
+}
+
+// Perbarui tagihan pending lewat provider (dipakai halaman bayar dan daftar transaksi).
+export async function refreshPending(env, payment) {
+  if (mode(env) !== 'live' || !payment || !payment.provider_id) return null;
+  if (payment.status !== 'pending') return null;
+  const r = await checkBuatQris(env, payment.provider_id);
+  if (!r.ok) return null;
+  if (r.status === 'paid') {
+    await markPaid(env, payment, { issuer: 'buatqris', raw: r.data });
+    return 'paid';
+  }
+  if (r.status === 'expired' || r.status === 'failed') {
+    await env.DB.prepare('UPDATE payments SET status = ?, updated_at = ? WHERE id = ?')
+      .bind(r.status, nowIso(), payment.id).run();
+    return r.status;
+  }
+  return 'pending';
 }
 
 // QR contoh (mode demo) — payload mirip EMVCo, jelas bukan transaksi nyata.
@@ -316,6 +427,13 @@ export async function logEvent(env, paymentId, type, payload) {
 
 // ===== Merek (white label) & notifikasi Telegram =====
 let brandReady = false;
+let providerIdReady = false;
+export async function ensurePaymentsProviderId(env) {
+  if (providerIdReady) return;
+  try { await env.DB.prepare('ALTER TABLE payments ADD COLUMN provider_id TEXT').run(); } catch (e) { /* ada */ }
+  providerIdReady = true;
+}
+
 export async function ensureBrandChannels(env) {
   if (brandReady) return;
   const cols = [

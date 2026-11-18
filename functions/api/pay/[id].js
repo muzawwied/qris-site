@@ -1,4 +1,4 @@
-import { ensureSchema, ensureBrandChannels, json, cors, publicPayment } from '../_lib.js';
+import { ensureSchema, ensureBrandChannels, ensurePaymentsProviderId, json, cors, publicPayment, refreshPending } from '../_lib.js';
 
 export async function onRequestOptions() {
   return cors();
@@ -8,6 +8,7 @@ export async function onRequestOptions() {
 export async function onRequestGet({ params, env }) {
   await ensureSchema(env);
   await ensureBrandChannels(env);
+  await ensurePaymentsProviderId(env);
   const id = String(params.id || '').trim();
   if (!id) return json({ error: 'id wajib.' }, 400);
 
@@ -18,6 +19,15 @@ export async function onRequestGet({ params, env }) {
   ).bind(id, id).first();
 
   if (!row) return json({ error: 'Tagihan tidak ditemukan.' }, 404);
+
+  // Cek langsung ke provider, paling sering tiap 15 detik per tagihan (batas provider).
+  if (row.status === 'pending' && row.provider_id) {
+    const last = row.updated_at ? Date.parse(row.updated_at) : 0;
+    if (!last || Date.now() - last > 15000) {
+      const fresh = await refreshPending(env, row);
+      if (fresh && fresh !== 'pending') row.status = fresh;
+    }
+  }
 
   // Tagihan pending yang sudah lewat masa berlaku otomatis jadi expired
   if (row.status === 'pending' && row.expires_at && Date.now() > Date.parse(row.expires_at)) {

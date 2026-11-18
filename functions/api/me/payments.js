@@ -1,4 +1,4 @@
-import { ensureSchema, ensurePaymentsUserId, json, cors, currentUser, ownerFromRequest, publicPayment, mode } from '../_lib.js';
+import { ensureSchema, ensurePaymentsUserId, ensurePaymentsProviderId, json, cors, currentUser, ownerFromRequest, publicPayment, mode, refreshPending } from '../_lib.js';
 
 export async function onRequestOptions() { return cors(); }
 
@@ -6,6 +6,7 @@ export async function onRequestOptions() { return cors(); }
 export async function onRequestGet({ request, env }) {
   await ensureSchema(env);
   await ensurePaymentsUserId(env);
+  await ensurePaymentsProviderId(env);
 
   const user = await ownerFromRequest(request, env);
   if (!user) return json({ error: 'Silakan masuk dulu.' }, 401);
@@ -21,6 +22,16 @@ export async function onRequestGet({ request, env }) {
   if (status && status !== 'all') { where.push('status = ?'); args.push(status); }
   if (q) { where.push('(id LIKE ? OR reference LIKE ? OR description LIKE ?)'); args.push(`%${q}%`, `%${q}%`, `%${q}%`); }
   const whereSql = 'WHERE ' + where.join(' AND ');
+
+  const pend = await env.DB.prepare(
+    "SELECT * FROM payments WHERE user_id = ? AND status='pending' AND provider_id IS NOT NULL ORDER BY created_at DESC LIMIT 8"
+  ).bind(user.id).all();
+  for (const row of (pend.results || [])) {
+    try {
+      const last = row.updated_at ? Date.parse(row.updated_at) : 0;
+      if (!last || Date.now() - last > 20000) await refreshPending(env, row);
+    } catch (e) { /* biarkan */ }
+  }
 
   const rows = await env.DB.prepare(
     `SELECT * FROM payments ${whereSql} ORDER BY created_at DESC LIMIT ? OFFSET ?`
